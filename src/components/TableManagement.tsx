@@ -87,7 +87,7 @@ const TableManagement: React.FC = () => {
       // Check if table number already exists (when creating new table)
       if (!editingTable) {
         const existingTable = tables.find(
-          (table) => table.number === formData.number,
+          (table) => table.number === formData.number
         );
         if (existingTable) {
           toast({
@@ -107,6 +107,18 @@ const TableManagement: React.FC = () => {
       };
 
       if (editingTable) {
+        if (
+          editingTable.status === "occupied" &&
+          formData.status !== "occupied"
+        ) {
+          toast({
+            title: "Error",
+            description: "Cannot change status of an occupied table",
+            variant: "destructive",
+          });
+          setSubmitting(false);
+          return;
+        }
         await updateDoc(doc(db, "tables", editingTable.id), tableData);
         toast({
           title: "Success",
@@ -261,7 +273,7 @@ const TableManagement: React.FC = () => {
                   <Select
                     value={formData.status}
                     onValueChange={(
-                      value: "available" | "occupied" | "reserved",
+                      value: "available" | "occupied" | "reserved"
                     ) => setFormData({ ...formData, status: value })}
                   >
                     <SelectTrigger>
