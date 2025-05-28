@@ -16,6 +16,7 @@ import Layout from "./Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DollarSign,
   Clock,
@@ -23,6 +24,8 @@ import {
   FileText,
   TrendingUp,
   History,
+  Settings,
+  UtensilsCrossed,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +44,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import BillGenerationModal from "./BillGenerationModal";
+import MenuManagement from "./MenuManagement";
+import TableManagement from "./TableManagement";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -206,325 +211,347 @@ const ReceptionDashboard: React.FC = () => {
 
   return (
     <Layout title="Reception Dashboard">
-      <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium">
-                    Today's Revenue
-                  </p>
-                  <p className="text-3xl font-bold">
-                    ${getTodaysRevenue().toFixed(2)}
-                  </p>
+      <Tabs defaultValue="dashboard" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="menu-management">
+            <UtensilsCrossed className="h-4 w-4 mr-2" />
+            Menu Management
+          </TabsTrigger>
+          <TabsTrigger value="table-management">
+            <Settings className="h-4 w-4 mr-2" />
+            Table Management
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="dashboard" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-100 text-sm font-medium">
+                      Today's Revenue
+                    </p>
+                    <p className="text-3xl font-bold">
+                      ${getTodaysRevenue().toFixed(2)}
+                    </p>
+                  </div>
+                  <DollarSign className="h-8 w-8 text-green-200" />
                 </div>
-                <DollarSign className="h-8 w-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium">
-                    Orders Today
-                  </p>
-                  <p className="text-3xl font-bold">{orders.length}</p>
+            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100 text-sm font-medium">
+                      Orders Today
+                    </p>
+                    <p className="text-3xl font-bold">{orders.length}</p>
+                  </div>
+                  <FileText className="h-8 w-8 text-blue-200" />
                 </div>
-                <FileText className="h-8 w-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm font-medium">
-                    Active Tables
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {getActiveTables().length}
-                  </p>
+            <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-orange-100 text-sm font-medium">
+                      Active Tables
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {getActiveTables().length}
+                    </p>
+                  </div>
+                  <Users className="h-8 w-8 text-orange-200" />
                 </div>
-                <Users className="h-8 w-8 text-orange-200" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm font-medium">
-                    Avg Order Value
-                  </p>
-                  <p className="text-3xl font-bold">
-                    ${getAverageOrderValue().toFixed(2)}
-                  </p>
+            <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm font-medium">
+                      Avg Order Value
+                    </p>
+                    <p className="text-3xl font-bold">
+                      ${getAverageOrderValue().toFixed(2)}
+                    </p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-purple-200" />
                 </div>
-                <TrendingUp className="h-8 w-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
 
-        {/* Active Tables & Recent Orders */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                Active Tables
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {getActiveTables().map((table) => {
-                  const tableTotal = getTableTotal(table.id);
-                  const timeOccupied = table.occupiedAt
-                    ? Math.floor(
-                        (new Date().getTime() - table.occupiedAt.getTime()) /
-                          (1000 * 60)
-                      )
-                    : 0;
+          {/* Active Tables & Recent Orders */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2" />
+                  Active Tables
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {getActiveTables().map((table) => {
+                    const tableTotal = getTableTotal(table.id);
+                    const timeOccupied = table.occupiedAt
+                      ? Math.floor(
+                          (new Date().getTime() - table.occupiedAt.getTime()) /
+                            (1000 * 60)
+                        )
+                      : 0;
 
-                  return (
+                    return (
+                      <div
+                        key={table.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div>
+                          <p className="font-medium">Table {table.number}</p>
+                          <p className="text-sm text-gray-600">
+                            {table.guestName}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">${tableTotal.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">
+                            {timeOccupied} min
+                          </p>
+                        </div>
+                        <div className="relative">
+                          <Button
+                            size="sm"
+                            className="bg-green-500 hover:bg-green-600"
+                            onClick={() => handleGenerateBill(table)}
+                            disabled={
+                              tableTotal === 0 || generatingBill === table.id
+                            }
+                          >
+                            {generatingBill === table.id ? (
+                              <div className="flex items-center">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Generating...
+                              </div>
+                            ) : (
+                              "Generate Bill"
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {getActiveTables().length === 0 && (
+                    <p className="text-gray-500 text-center py-8">
+                      No active tables
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Clock className="h-5 w-5 mr-2" />
+                  Recent Orders
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {getRecentOrders().map((order) => (
                     <div
-                      key={table.id}
+                      key={order.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                     >
                       <div>
-                        <p className="font-medium">Table {table.number}</p>
+                        <p className="font-medium">#{order.id.slice(-6)}</p>
                         <p className="text-sm text-gray-600">
-                          {table.guestName}
+                          Table {order.tableNumber}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${tableTotal.toFixed(2)}</p>
-                        <p className="text-sm text-gray-600">
-                          {timeOccupied} min
-                        </p>
-                      </div>
-                      <div className="relative">
-                        <Button
-                          size="sm"
-                          className="bg-green-500 hover:bg-green-600"
-                          onClick={() => handleGenerateBill(table)}
-                          disabled={
-                            tableTotal === 0 || generatingBill === table.id
+                        <Badge
+                          variant={
+                            order.status === "ready" ? "default" : "secondary"
+                          }
+                          className={
+                            order.status === "preparing"
+                              ? "bg-blue-500"
+                              : order.status === "ready"
+                                ? "bg-green-500"
+                                : order.status === "served"
+                                  ? "bg-gray-500"
+                                  : "bg-orange-500"
                           }
                         >
-                          {generatingBill === table.id ? (
-                            <div className="flex items-center">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Generating...
-                            </div>
-                          ) : (
-                            "Generate Bill"
-                          )}
-                        </Button>
+                          {order.status}
+                        </Badge>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {getTimeAgo(order.createdAt)}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-                {getActiveTables().length === 0 && (
-                  <p className="text-gray-500 text-center py-8">
-                    No active tables
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                  {getRecentOrders().length === 0 && (
+                    <p className="text-gray-500 text-center py-8">
+                      No recent orders
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
+          {/* Bill History */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
-                Recent Orders
+                <History className="h-5 w-5 mr-2" />
+                Bill History
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {getRecentOrders().map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">#{order.id.slice(-6)}</p>
-                      <p className="text-sm text-gray-600">
-                        Table {order.tableNumber}
-                      </p>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="paid-bills">
+                  <AccordionTrigger>
+                    <div className="flex items-center justify-between w-full mr-4">
+                      <span>Paid Bills ({getPaidBills().length})</span>
+                      <span className="text-green-600 font-semibold">
+                        $
+                        {getPaidBills()
+                          .reduce((sum, bill) => sum + bill.total, 0)
+                          .toFixed(2)}
+                      </span>
                     </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          order.status === "ready" ? "default" : "secondary"
-                        }
-                        className={
-                          order.status === "preparing"
-                            ? "bg-blue-500"
-                            : order.status === "ready"
-                              ? "bg-green-500"
-                              : order.status === "served"
-                                ? "bg-gray-500"
-                                : "bg-orange-500"
-                        }
-                      >
-                        {order.status}
-                      </Badge>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {getTimeAgo(order.createdAt)}
-                      </p>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {getPaidBills().length === 0 ? (
+                        <p className="text-gray-500 text-center py-4">
+                          No paid bills found
+                        </p>
+                      ) : (
+                        <TableComponent>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Bill ID</TableHead>
+                              <TableHead>Table</TableHead>
+                              <TableHead>Guest</TableHead>
+                              <TableHead>Amount</TableHead>
+                              <TableHead>Paid At</TableHead>
+                              <TableHead>Payment</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {getPaidBills().map((bill) => (
+                              <TableRow key={bill.id}>
+                                <TableCell className="font-mono text-sm">
+                                  #{bill.id.slice(-6)}
+                                </TableCell>
+                                <TableCell>{bill.tableNumber}</TableCell>
+                                <TableCell>{bill.guestName}</TableCell>
+                                <TableCell className="font-medium">
+                                  ${bill.total.toFixed(2)}
+                                </TableCell>
+                                <TableCell className="text-sm">
+                                  {bill.paidAt ? formatDate(bill.paidAt) : "-"}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="text-xs">
+                                    {bill.paymentMethod || "cash"}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </TableComponent>
+                      )}
                     </div>
-                  </div>
-                ))}
-                {getRecentOrders().length === 0 && (
-                  <p className="text-gray-500 text-center py-8">
-                    No recent orders
-                  </p>
-                )}
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="pending-bills">
+                  <AccordionTrigger>
+                    <div className="flex items-center justify-between w-full mr-4">
+                      <span>Pending Bills ({getPendingBills().length})</span>
+                      <span className="text-orange-600 font-semibold">
+                        $
+                        {getPendingBills()
+                          .reduce((sum, bill) => sum + bill.total, 0)
+                          .toFixed(2)}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {getPendingBills().length === 0 ? (
+                        <p className="text-gray-500 text-center py-4">
+                          No pending bills
+                        </p>
+                      ) : (
+                        <TableComponent>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Bill ID</TableHead>
+                              <TableHead>Table</TableHead>
+                              <TableHead>Guest</TableHead>
+                              <TableHead>Amount</TableHead>
+                              <TableHead>Generated At</TableHead>
+                              <TableHead>Status</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {getPendingBills().map((bill) => (
+                              <TableRow key={bill.id}>
+                                <TableCell className="font-mono text-sm">
+                                  #{bill.id.slice(-6)}
+                                </TableCell>
+                                <TableCell>{bill.tableNumber}</TableCell>
+                                <TableCell>{bill.guestName}</TableCell>
+                                <TableCell className="font-medium">
+                                  ${bill.total.toFixed(2)}
+                                </TableCell>
+                                <TableCell className="text-sm">
+                                  {formatDate(bill.generatedAt)}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
+                                    Pending
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </TableComponent>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
           </Card>
-        </div>
+        </TabsContent>
 
-        {/* Bill History */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <History className="h-5 w-5 mr-2" />
-              Bill History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="paid-bills">
-                <AccordionTrigger>
-                  <div className="flex items-center justify-between w-full mr-4">
-                    <span>Paid Bills ({getPaidBills().length})</span>
-                    <span className="text-green-600 font-semibold">
-                      $
-                      {getPaidBills()
-                        .reduce((sum, bill) => sum + bill.total, 0)
-                        .toFixed(2)}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {getPaidBills().length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">
-                        No paid bills found
-                      </p>
-                    ) : (
-                      <TableComponent>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Bill ID</TableHead>
-                            <TableHead>Table</TableHead>
-                            <TableHead>Guest</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Paid At</TableHead>
-                            <TableHead>Payment</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {getPaidBills().map((bill) => (
-                            <TableRow key={bill.id}>
-                              <TableCell className="font-mono text-sm">
-                                #{bill.id.slice(-6)}
-                              </TableCell>
-                              <TableCell>{bill.tableNumber}</TableCell>
-                              <TableCell>{bill.guestName}</TableCell>
-                              <TableCell className="font-medium">
-                                ${bill.total.toFixed(2)}
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                {bill.paidAt ? formatDate(bill.paidAt) : "-"}
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="text-xs">
-                                  {bill.paymentMethod || "cash"}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </TableComponent>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+        <TabsContent value="menu-management">
+          <MenuManagement />
+        </TabsContent>
 
-              <AccordionItem value="pending-bills">
-                <AccordionTrigger>
-                  <div className="flex items-center justify-between w-full mr-4">
-                    <span>Pending Bills ({getPendingBills().length})</span>
-                    <span className="text-orange-600 font-semibold">
-                      $
-                      {getPendingBills()
-                        .reduce((sum, bill) => sum + bill.total, 0)
-                        .toFixed(2)}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {getPendingBills().length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">
-                        No pending bills
-                      </p>
-                    ) : (
-                      <TableComponent>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Bill ID</TableHead>
-                            <TableHead>Table</TableHead>
-                            <TableHead>Guest</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Generated At</TableHead>
-                            <TableHead>Status</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {getPendingBills().map((bill) => (
-                            <TableRow key={bill.id}>
-                              <TableCell className="font-mono text-sm">
-                                #{bill.id.slice(-6)}
-                              </TableCell>
-                              <TableCell>{bill.tableNumber}</TableCell>
-                              <TableCell>{bill.guestName}</TableCell>
-                              <TableCell className="font-medium">
-                                ${bill.total.toFixed(2)}
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                {formatDate(bill.generatedAt)}
-                              </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant="destructive"
-                                  className="text-xs"
-                                >
-                                  Pending
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </TableComponent>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="table-management">
+          <TableManagement />
+        </TabsContent>
+      </Tabs>
 
       {selectedTable && (
         <BillGenerationModal
