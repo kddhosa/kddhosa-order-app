@@ -1,14 +1,16 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Category, MenuItem } from "@/types";
+
+const DEFAULT_GST_RATE = 18;
 
 interface MenuContextType {
   menuItems: MenuItem[];
   categories: Category[];
   loading: boolean;
   error: string | null;
+  gst: number;
 }
 
 const MenuContext = createContext<MenuContextType>({
@@ -16,6 +18,7 @@ const MenuContext = createContext<MenuContextType>({
   categories: [],
   loading: true,
   error: null,
+  gst: DEFAULT_GST_RATE,
 });
 
 export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -23,6 +26,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [gst, setGst] = useState<number>(DEFAULT_GST_RATE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +47,14 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
+    const fetchGST = async () => {
+      try {
+        const taxDoc = await getDoc(doc(db, "settings", "tax"));
+        setGst(taxDoc?.data()?.gst || DEFAULT_GST_RATE);
+      } catch (error) {
+        setGst(DEFAULT_GST_RATE);
+      }
+    };
     const menuItemsCollection = collection(db, "menuItems");
     const unsubscribe = onSnapshot(
       menuItemsCollection,
@@ -52,7 +64,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
             id: doc.id,
             ...doc.data(),
           })) as MenuItem[];
-          
+
           console.log({ items });
 
           setMenuItems(items.filter((item) => item.isAvailable));
@@ -72,6 +84,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     fetchCategories();
+    fetchGST();
 
     return () => {
       unsubscribe();
@@ -85,6 +98,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
         categories,
         loading,
         error,
+        gst,
       }}
     >
       {children}

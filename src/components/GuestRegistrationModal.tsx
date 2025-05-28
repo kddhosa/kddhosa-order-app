@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { User, Phone, Users, MessageSquare } from "lucide-react";
+import { User, Phone, Users, MessageSquare, Loader2 } from "lucide-react";
 
 interface GuestRegistrationModalProps {
   isOpen: boolean;
@@ -21,6 +21,7 @@ interface GuestRegistrationModalProps {
     notes?: string;
   }) => void;
   tableNumber?: number;
+  isLoading: boolean;
 }
 
 const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
@@ -28,6 +29,7 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
   onClose,
   onSubmit,
   tableNumber,
+  isLoading = false,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -188,14 +190,20 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               variant="outline"
               onClick={handleClose}
               className="flex-1"
+              disabled={isLoading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              disabled={isLoading}
               className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
             >
-              Assign Table
+              {isLoading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                "Register Guest"
+              )}
             </Button>
           </div>
         </form>

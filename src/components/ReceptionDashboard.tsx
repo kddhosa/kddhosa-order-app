@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -17,7 +16,14 @@ import Layout from "./Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, Users, FileText, TrendingUp, History } from "lucide-react";
+import {
+  DollarSign,
+  Clock,
+  Users,
+  FileText,
+  TrendingUp,
+  History,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -62,7 +68,7 @@ const ReceptionDashboard: React.FC = () => {
       })) as Order[];
 
       const todayOrders = ordersData.filter(
-        (order) => order.createdAt >= today,
+        (order) => order.createdAt >= today
       );
 
       setOrders(todayOrders);
@@ -121,20 +127,29 @@ const ReceptionDashboard: React.FC = () => {
 
   const getTableOrders = (tableId: string) => {
     return orders.filter(
-      (order) => order.tableId === tableId && order.status !== "served",
+      (order) => order.tableId === tableId && order.status === "served"
     );
   };
 
   const getTableTotal = (tableId: string) => {
-    return getTableOrders(tableId).reduce(
-      (total, order) => total + order.totalAmount,
-      0,
-    );
+    const orders = getTableOrders(tableId);
+    console.log(`Calculating total for table ${tableId}`);
+    console.log({
+      orders,
+      total: orders.reduce((total, order) => {
+        console.log({ total, orderTotal: order.totalAmount });
+
+        return total + order.totalAmount;
+      }, 0),
+    });
+
+    return orders.reduce((total, order) => total + order.totalAmount, 0);
   };
 
   const handleGenerateBill = (table: Table) => {
     setSelectedTable(table);
     setShowBillModal(true);
+    setGeneratingBill(table.id);
   };
 
   const getRecentOrders = () => {
@@ -273,7 +288,7 @@ const ReceptionDashboard: React.FC = () => {
                   const timeOccupied = table.occupiedAt
                     ? Math.floor(
                         (new Date().getTime() - table.occupiedAt.getTime()) /
-                          (1000 * 60),
+                          (1000 * 60)
                       )
                     : 0;
 
@@ -299,7 +314,9 @@ const ReceptionDashboard: React.FC = () => {
                           size="sm"
                           className="bg-green-500 hover:bg-green-600"
                           onClick={() => handleGenerateBill(table)}
-                          disabled={tableTotal === 0 || generatingBill === table.id}
+                          disabled={
+                            tableTotal === 0 || generatingBill === table.id
+                          }
                         >
                           {generatingBill === table.id ? (
                             <div className="flex items-center">
@@ -391,14 +408,19 @@ const ReceptionDashboard: React.FC = () => {
                   <div className="flex items-center justify-between w-full mr-4">
                     <span>Paid Bills ({getPaidBills().length})</span>
                     <span className="text-green-600 font-semibold">
-                      ${getPaidBills().reduce((sum, bill) => sum + bill.total, 0).toFixed(2)}
+                      $
+                      {getPaidBills()
+                        .reduce((sum, bill) => sum + bill.total, 0)
+                        .toFixed(2)}
                     </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {getPaidBills().length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">No paid bills found</p>
+                      <p className="text-gray-500 text-center py-4">
+                        No paid bills found
+                      </p>
                     ) : (
                       <TableComponent>
                         <TableHeader>
@@ -444,14 +466,19 @@ const ReceptionDashboard: React.FC = () => {
                   <div className="flex items-center justify-between w-full mr-4">
                     <span>Pending Bills ({getPendingBills().length})</span>
                     <span className="text-orange-600 font-semibold">
-                      ${getPendingBills().reduce((sum, bill) => sum + bill.total, 0).toFixed(2)}
+                      $
+                      {getPendingBills()
+                        .reduce((sum, bill) => sum + bill.total, 0)
+                        .toFixed(2)}
                     </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {getPendingBills().length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">No pending bills</p>
+                      <p className="text-gray-500 text-center py-4">
+                        No pending bills
+                      </p>
                     ) : (
                       <TableComponent>
                         <TableHeader>
@@ -479,7 +506,10 @@ const ReceptionDashboard: React.FC = () => {
                                 {formatDate(bill.generatedAt)}
                               </TableCell>
                               <TableCell>
-                                <Badge variant="destructive" className="text-xs">
+                                <Badge
+                                  variant="destructive"
+                                  className="text-xs"
+                                >
                                   Pending
                                 </Badge>
                               </TableCell>
@@ -502,6 +532,7 @@ const ReceptionDashboard: React.FC = () => {
           onClose={() => {
             setShowBillModal(false);
             setSelectedTable(null);
+            setGeneratingBill(null);
           }}
           table={selectedTable}
           orders={getTableOrders(selectedTable.id)}

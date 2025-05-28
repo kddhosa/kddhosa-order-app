@@ -13,6 +13,7 @@ import { doc, updateDoc, addDoc, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Receipt, CreditCard, DollarSign } from "lucide-react";
+import { useMenu } from "@/contexts/MenuContext";
 
 interface BillGenerationModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
+  const { gst } = useMenu();
 
   const getAllItems = () => {
     const items = orders.flatMap((order) => order.items);
@@ -39,12 +41,12 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const getSubtotal = () => {
     return getAllItems().reduce(
       (total, item) => total + item.price * item.quantity,
-      0,
+      0
     );
   };
 
   const getTax = () => {
-    return getSubtotal() * 0.1; // 10% tax
+    return getSubtotal() * (gst / 100);
   };
 
   const getTotal = () => {

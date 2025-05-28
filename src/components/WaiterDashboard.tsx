@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -58,7 +57,7 @@ const WaiterDashboard: React.FC = () => {
           variant: "destructive",
         });
         setLoading(false);
-      },
+      }
     );
 
     return unsubscribe;
@@ -92,7 +91,7 @@ const WaiterDashboard: React.FC = () => {
     (table) =>
       table.number.toString().includes(searchQuery) ||
       table.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      table.status.toLowerCase().includes(searchQuery.toLowerCase()),
+      table.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTableClick = (table: Table) => {
@@ -235,7 +234,9 @@ const WaiterDashboard: React.FC = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="font-medium">Table {order.tableNumber}</p>
-                        <p className="text-sm text-gray-600">{order.guestName}</p>
+                        <p className="text-sm text-gray-600">
+                          {order.guestName}
+                        </p>
                       </div>
                       <Badge className="bg-green-500">Ready</Badge>
                     </div>
@@ -303,7 +304,9 @@ const WaiterDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
-                    <span className="text-sm font-medium">Assigning table...</span>
+                    <span className="text-sm font-medium">
+                      Assigning table...
+                    </span>
                   </div>
                 </div>
               )}
@@ -326,6 +329,7 @@ const WaiterDashboard: React.FC = () => {
           setShowGuestModal(false);
           setSelectedTable(null);
         }}
+        isLoading={occupyingTable === selectedTable?.id}
         onSubmit={handleGuestRegistration}
         tableNumber={selectedTable?.number}
       />
