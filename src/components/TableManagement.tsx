@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -272,9 +273,8 @@ const TableManagement: React.FC = () => {
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(
-                      value: "available" | "occupied" | "reserved"
-                    ) => setFormData({ ...formData, status: value })}
+                    onValueChange={(value: TableStatus) => 
+                      setFormData({ ...formData, status: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />

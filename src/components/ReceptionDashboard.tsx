@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -46,6 +47,7 @@ import {
 import BillGenerationModal from "./BillGenerationModal";
 import MenuManagement from "./MenuManagement";
 import TableManagement from "./TableManagement";
+import AnalyticsDialog from "./AnalyticsDialog";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -211,6 +213,11 @@ const ReceptionDashboard: React.FC = () => {
 
   return (
     <Layout title="Reception Dashboard">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Reception Dashboard</h1>
+        <AnalyticsDialog />
+      </div>
+      
       <Tabs defaultValue="dashboard" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
