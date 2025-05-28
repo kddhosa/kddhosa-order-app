@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { MenuProvider } from "@/contexts/MenuContext";
 import AuthScreen from "@/components/AuthScreen";
 import MainApp from "@/components/MainApp";
 import { Toaster } from "@/components/ui/toaster";
@@ -29,9 +30,11 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <AppContent />
+        <MenuProvider>
+          <Toaster />
+          <Sonner />
+          <AppContent />
+        </MenuProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

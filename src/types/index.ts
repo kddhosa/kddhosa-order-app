@@ -77,3 +77,8 @@ export interface User {
   role: UserRole;
   displayName?: string;
 }
+
+export interface Category {
+  id: string;
+  category: string
+}

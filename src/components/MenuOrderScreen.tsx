@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  onSnapshot,
-  addDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import React, { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { MenuItem, OrderItem, Table } from "@/types";
+import { OrderItem, Table, MenuItem } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMenu } from "@/contexts/MenuContext";
 import Layout from "./Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,28 +23,11 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   table,
   onOrderSubmitted,
 }) => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-
-  const categories = ["appetizers", "main_course", "desserts", "beverages"];
-
-  useEffect(() => {
-    const q = query(collection(db, "menuItems"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as MenuItem[];
-      setMenuItems(items.filter((item) => item.isAvailable));
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
+  const { menuItems, categories, loading } = useMenu();
 
   const addToOrder = (menuItem: MenuItem) => {
     const existingItem = orderItems.find((item) => item.id === menuItem.id);
@@ -59,8 +36,8 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
         orderItems.map((item) =>
           item.id === menuItem.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        ),
+            : item
+        )
       );
     } else {
       const orderItem: OrderItem = {
@@ -80,24 +57,22 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
     } else {
       setOrderItems(
         orderItems.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item,
-        ),
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        )
       );
     }
   };
 
   const updateNotes = (itemId: string, notes: string) => {
     setOrderItems(
-      orderItems.map((item) =>
-        item.id === itemId ? { ...item, notes } : item,
-      ),
+      orderItems.map((item) => (item.id === itemId ? { ...item, notes } : item))
     );
   };
 
   const getTotalAmount = () => {
     return orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
-      0,
+      0
     );
   };
 
@@ -164,23 +139,15 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
         <div className="lg:col-span-2">
           <Tabs defaultValue="appetizers" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="capitalize"
-                >
+              {categories.map(({ id, category }) => (
+                <TabsTrigger key={id} value={category} className="capitalize">
                   {category.replace("_", " ")}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {categories.map((category) => (
-              <TabsContent
-                key={category}
-                value={category}
-                className="space-y-4"
-              >
+            {categories.map(({ id, category }) => (
+              <TabsContent key={id} value={category} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {getMenuItemsByCategory(category).map((item) => (
                     <Card
