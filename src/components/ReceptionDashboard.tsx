@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -7,6 +8,8 @@ import {
   updateDoc,
   addDoc,
   where,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Order, Table, Bill } from "@/types";
@@ -14,20 +17,36 @@ import Layout from "./Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, Users, FileText, TrendingUp } from "lucide-react";
+import { DollarSign, Clock, Users, FileText, TrendingUp, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Table as TableComponent,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import BillGenerationModal from "./BillGenerationModal";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [showBillModal, setShowBillModal] = useState(false);
+  const [generatingBill, setGeneratingBill] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Fetch today's orders
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -42,7 +61,6 @@ const ReceptionDashboard: React.FC = () => {
         servedAt: doc.data().servedAt?.toDate(),
       })) as Order[];
 
-      // Filter today's orders
       const todayOrders = ordersData.filter(
         (order) => order.createdAt >= today,
       );
@@ -50,7 +68,6 @@ const ReceptionDashboard: React.FC = () => {
       setOrders(todayOrders);
     });
 
-    // Fetch tables
     const tablesQuery = query(collection(db, "tables"));
     const unsubscribeTables = onSnapshot(tablesQuery, (snapshot) => {
       const tablesData = snapshot.docs.map((doc) => ({
@@ -63,9 +80,26 @@ const ReceptionDashboard: React.FC = () => {
       setLoading(false);
     });
 
+    const billsQuery = query(
+      collection(db, "bills"),
+      orderBy("generatedAt", "desc"),
+      limit(50)
+    );
+    const unsubscribeBills = onSnapshot(billsQuery, (snapshot) => {
+      const billsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        generatedAt: doc.data().generatedAt?.toDate(),
+        paidAt: doc.data().paidAt?.toDate(),
+      })) as Bill[];
+
+      setBills(billsData);
+    });
+
     return () => {
       unsubscribeOrders();
       unsubscribeTables();
+      unsubscribeBills();
     };
   }, []);
 
@@ -119,11 +153,37 @@ const ReceptionDashboard: React.FC = () => {
     return `${minutes} min ago`;
   };
 
+  const getPaidBills = () => {
+    return bills.filter((bill) => bill.status === "paid");
+  };
+
+  const getPendingBills = () => {
+    return bills.filter((bill) => bill.status === "pending");
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (loading) {
     return (
       <Layout title="Reception Dashboard">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-24 w-full" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
         </div>
       </Layout>
     );
@@ -234,14 +294,23 @@ const ReceptionDashboard: React.FC = () => {
                           {timeOccupied} min
                         </p>
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-green-500 hover:bg-green-600"
-                        onClick={() => handleGenerateBill(table)}
-                        disabled={tableTotal === 0}
-                      >
-                        Generate Bill
-                      </Button>
+                      <div className="relative">
+                        <Button
+                          size="sm"
+                          className="bg-green-500 hover:bg-green-600"
+                          onClick={() => handleGenerateBill(table)}
+                          disabled={tableTotal === 0 || generatingBill === table.id}
+                        >
+                          {generatingBill === table.id ? (
+                            <div className="flex items-center">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Generating...
+                            </div>
+                          ) : (
+                            "Generate Bill"
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
@@ -306,6 +375,125 @@ const ReceptionDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Bill History */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <History className="h-5 w-5 mr-2" />
+              Bill History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="paid-bills">
+                <AccordionTrigger>
+                  <div className="flex items-center justify-between w-full mr-4">
+                    <span>Paid Bills ({getPaidBills().length})</span>
+                    <span className="text-green-600 font-semibold">
+                      ${getPaidBills().reduce((sum, bill) => sum + bill.total, 0).toFixed(2)}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {getPaidBills().length === 0 ? (
+                      <p className="text-gray-500 text-center py-4">No paid bills found</p>
+                    ) : (
+                      <TableComponent>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Bill ID</TableHead>
+                            <TableHead>Table</TableHead>
+                            <TableHead>Guest</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Paid At</TableHead>
+                            <TableHead>Payment</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getPaidBills().map((bill) => (
+                            <TableRow key={bill.id}>
+                              <TableCell className="font-mono text-sm">
+                                #{bill.id.slice(-6)}
+                              </TableCell>
+                              <TableCell>{bill.tableNumber}</TableCell>
+                              <TableCell>{bill.guestName}</TableCell>
+                              <TableCell className="font-medium">
+                                ${bill.total.toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-sm">
+                                {bill.paidAt ? formatDate(bill.paidAt) : "-"}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="text-xs">
+                                  {bill.paymentMethod || "cash"}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </TableComponent>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="pending-bills">
+                <AccordionTrigger>
+                  <div className="flex items-center justify-between w-full mr-4">
+                    <span>Pending Bills ({getPendingBills().length})</span>
+                    <span className="text-orange-600 font-semibold">
+                      ${getPendingBills().reduce((sum, bill) => sum + bill.total, 0).toFixed(2)}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {getPendingBills().length === 0 ? (
+                      <p className="text-gray-500 text-center py-4">No pending bills</p>
+                    ) : (
+                      <TableComponent>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Bill ID</TableHead>
+                            <TableHead>Table</TableHead>
+                            <TableHead>Guest</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Generated At</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getPendingBills().map((bill) => (
+                            <TableRow key={bill.id}>
+                              <TableCell className="font-mono text-sm">
+                                #{bill.id.slice(-6)}
+                              </TableCell>
+                              <TableCell>{bill.tableNumber}</TableCell>
+                              <TableCell>{bill.guestName}</TableCell>
+                              <TableCell className="font-medium">
+                                ${bill.total.toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-sm">
+                                {formatDate(bill.generatedAt)}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="destructive" className="text-xs">
+                                  Pending
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </TableComponent>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
       </div>
 
       {selectedTable && (

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -5,10 +6,10 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  addDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Table } from "@/types";
+import { Table, Order } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import Layout from "./Layout";
 import TableCard from "./TableCard";
@@ -16,16 +17,21 @@ import GuestRegistrationModal from "./GuestRegistrationModal";
 import MenuOrderScreen from "./MenuOrderScreen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Search, Plus, ArrowLeft, Clock, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const WaiterDashboard: React.FC = () => {
   const [tables, setTables] = useState<Table[]>([]);
+  const [readyOrders, setReadyOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [showMenuScreen, setShowMenuScreen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [occupyingTable, setOccupyingTable] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -40,7 +46,6 @@ const WaiterDashboard: React.FC = () => {
           occupiedAt: doc.data().occupiedAt?.toDate(),
         })) as Table[];
 
-        // Sort by table number
         tablesData.sort((a, b) => a.number - b.number);
         setTables(tablesData);
         setLoading(false);
@@ -58,6 +63,30 @@ const WaiterDashboard: React.FC = () => {
 
     return unsubscribe;
   }, [toast]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const ordersQuery = query(
+      collection(db, "orders"),
+      where("status", "==", "ready"),
+      where("waiterId", "==", user.uid)
+    );
+
+    const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
+      const orders = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        updatedAt: doc.data().updatedAt?.toDate(),
+        servedAt: doc.data().servedAt?.toDate(),
+      })) as Order[];
+
+      setReadyOrders(orders);
+    });
+
+    return unsubscribeOrders;
+  }, [user]);
 
   const filteredTables = tables.filter(
     (table) =>
@@ -84,6 +113,8 @@ const WaiterDashboard: React.FC = () => {
   }) => {
     if (!selectedTable || !user) return;
 
+    setOccupyingTable(selectedTable.id);
+
     try {
       await updateDoc(doc(db, "tables", selectedTable.id), {
         status: "occupied",
@@ -105,6 +136,29 @@ const WaiterDashboard: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to assign table. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setOccupyingTable(null);
+    }
+  };
+
+  const handleOrderServed = async (orderId: string) => {
+    try {
+      await updateDoc(doc(db, "orders", orderId), {
+        status: "served",
+        servedAt: new Date(),
+      });
+
+      toast({
+        title: "Order Served",
+        description: "Order marked as served successfully",
+      });
+    } catch (error) {
+      console.error("Error updating order:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
         variant: "destructive",
       });
     }
@@ -144,8 +198,16 @@ const WaiterDashboard: React.FC = () => {
   if (loading) {
     return (
       <Layout title="Table Management">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <Skeleton className="h-10 w-64" />
+            <Skeleton className="h-6 w-48" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
         </div>
       </Layout>
     );
@@ -154,6 +216,55 @@ const WaiterDashboard: React.FC = () => {
   return (
     <Layout title="Table Management">
       <div className="space-y-6">
+        {/* Ready Orders Section */}
+        {readyOrders.length > 0 && (
+          <Card className="bg-green-50 border-green-200">
+            <CardHeader>
+              <CardTitle className="flex items-center text-green-800">
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Ready for Pickup ({readyOrders.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {readyOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="bg-white p-4 rounded-lg border border-green-200"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-medium">Table {order.tableNumber}</p>
+                        <p className="text-sm text-gray-600">{order.guestName}</p>
+                      </div>
+                      <Badge className="bg-green-500">Ready</Badge>
+                    </div>
+                    <div className="space-y-1 mb-3">
+                      {order.items.slice(0, 2).map((item, idx) => (
+                        <p key={idx} className="text-sm">
+                          {item.quantity}x {item.name}
+                        </p>
+                      ))}
+                      {order.items.length > 2 && (
+                        <p className="text-sm text-gray-500">
+                          +{order.items.length - 2} more items
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => handleOrderServed(order.id)}
+                    >
+                      Mark as Served
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -183,11 +294,20 @@ const WaiterDashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredTables.map((table) => (
-            <TableCard
-              key={table.id}
-              table={table}
-              onClick={() => handleTableClick(table)}
-            />
+            <div key={table.id} className="relative">
+              <TableCard
+                table={table}
+                onClick={() => handleTableClick(table)}
+              />
+              {occupyingTable === table.id && (
+                <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
+                    <span className="text-sm font-medium">Assigning table...</span>
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
