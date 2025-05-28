@@ -41,7 +41,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const getSubtotal = () => {
     return getAllItems().reduce(
       (total, item) => total + item.price * item.quantity,
-      0
+      0,
     );
   };
 

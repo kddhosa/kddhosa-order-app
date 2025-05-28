@@ -36,8 +36,8 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
         orderItems.map((item) =>
           item.id === menuItem.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
+            : item,
+        ),
       );
     } else {
       const orderItem: OrderItem = {
@@ -57,22 +57,24 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
     } else {
       setOrderItems(
         orderItems.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        )
+          item.id === itemId ? { ...item, quantity: newQuantity } : item,
+        ),
       );
     }
   };
 
   const updateNotes = (itemId: string, notes: string) => {
     setOrderItems(
-      orderItems.map((item) => (item.id === itemId ? { ...item, notes } : item))
+      orderItems.map((item) =>
+        item.id === itemId ? { ...item, notes } : item,
+      ),
     );
   };
 
   const getTotalAmount = () => {
     return orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
-      0
+      0,
     );
   };
 

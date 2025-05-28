@@ -80,7 +80,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("Error fetching menu items:", err);
         setError("Failed to connect to menu data");
         setLoading(false);
-      }
+      },
     );
 
     fetchCategories();

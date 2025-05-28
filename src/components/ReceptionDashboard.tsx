@@ -73,7 +73,7 @@ const ReceptionDashboard: React.FC = () => {
       })) as Order[];
 
       const todayOrders = ordersData.filter(
-        (order) => order.createdAt >= today
+        (order) => order.createdAt >= today,
       );
 
       setOrders(todayOrders);
@@ -94,7 +94,7 @@ const ReceptionDashboard: React.FC = () => {
     const billsQuery = query(
       collection(db, "bills"),
       orderBy("generatedAt", "desc"),
-      limit(50)
+      limit(50),
     );
     const unsubscribeBills = onSnapshot(billsQuery, (snapshot) => {
       const billsData = snapshot.docs.map((doc) => ({
@@ -132,7 +132,7 @@ const ReceptionDashboard: React.FC = () => {
 
   const getTableOrders = (tableId: string) => {
     return orders.filter(
-      (order) => order.tableId === tableId && order.status === "served"
+      (order) => order.tableId === tableId && order.status === "served",
     );
   };
 
@@ -306,7 +306,7 @@ const ReceptionDashboard: React.FC = () => {
                     const timeOccupied = table.occupiedAt
                       ? Math.floor(
                           (new Date().getTime() - table.occupiedAt.getTime()) /
-                            (1000 * 60)
+                            (1000 * 60),
                         )
                       : 0;
 
@@ -322,7 +322,9 @@ const ReceptionDashboard: React.FC = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">${tableTotal.toFixed(2)}</p>
+                          <p className="font-medium">
+                            ${tableTotal.toFixed(2)}
+                          </p>
                           <p className="text-sm text-gray-600">
                             {timeOccupied} min
                           </p>

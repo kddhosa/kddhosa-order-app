@@ -1,6 +1,11 @@
-
 import React, { useState } from "react";
-import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useMenu } from "@/contexts/MenuContext";
 import { MenuItem, Category } from "@/types";
@@ -76,7 +81,10 @@ const MenuManagement: React.FC = () => {
         price: Number(formData.price),
         category: formData.category,
         preparationTime: Number(formData.preparationTime),
-        allergens: formData.allergens.split(",").map(a => a.trim()).filter(Boolean),
+        allergens: formData.allergens
+          .split(",")
+          .map((a) => a.trim())
+          .filter(Boolean),
         isAvailable: formData.isAvailable,
       };
 
@@ -169,7 +177,10 @@ const MenuManagement: React.FC = () => {
           <CardTitle>Menu Management</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="bg-green-500 hover:bg-green-600">
+              <Button
+                onClick={openAddDialog}
+                className="bg-green-500 hover:bg-green-600"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Menu Item
               </Button>
@@ -186,7 +197,9 @@ const MenuManagement: React.FC = () => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -195,7 +208,9 @@ const MenuManagement: React.FC = () => {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -208,7 +223,12 @@ const MenuManagement: React.FC = () => {
                       step="0.01"
                       min="0"
                       value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          price: Number(e.target.value),
+                        })
+                      }
                       required
                     />
                   </div>
@@ -219,7 +239,12 @@ const MenuManagement: React.FC = () => {
                       type="number"
                       min="1"
                       value={formData.preparationTime}
-                      onChange={(e) => setFormData({ ...formData, preparationTime: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          preparationTime: Number(e.target.value),
+                        })
+                      }
                       required
                     />
                   </div>
@@ -228,7 +253,9 @@ const MenuManagement: React.FC = () => {
                   <Label htmlFor="category">Category</Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, category: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
@@ -247,7 +274,9 @@ const MenuManagement: React.FC = () => {
                   <Input
                     id="allergens"
                     value={formData.allergens}
-                    onChange={(e) => setFormData({ ...formData, allergens: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, allergens: e.target.value })
+                    }
                     placeholder="e.g., nuts, dairy, gluten"
                   />
                 </div>
@@ -256,7 +285,12 @@ const MenuManagement: React.FC = () => {
                     type="checkbox"
                     id="isAvailable"
                     checked={formData.isAvailable}
-                    onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        isAvailable: e.target.checked,
+                      })
+                    }
                   />
                   <Label htmlFor="isAvailable">Available</Label>
                 </div>
@@ -269,7 +303,11 @@ const MenuManagement: React.FC = () => {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={submitting} className="flex-1">
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1"
+                  >
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}

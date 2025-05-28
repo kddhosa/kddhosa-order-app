@@ -80,5 +80,5 @@ export interface User {
 
 export interface Category {
   id: string;
-  category: string
+  category: string;
 }

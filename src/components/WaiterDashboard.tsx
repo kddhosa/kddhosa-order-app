@@ -57,7 +57,7 @@ const WaiterDashboard: React.FC = () => {
           variant: "destructive",
         });
         setLoading(false);
-      }
+      },
     );
 
     return unsubscribe;
@@ -69,7 +69,7 @@ const WaiterDashboard: React.FC = () => {
     const ordersQuery = query(
       collection(db, "orders"),
       where("status", "==", "ready"),
-      where("waiterId", "==", user.uid)
+      where("waiterId", "==", user.uid),
     );
 
     const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
@@ -91,7 +91,7 @@ const WaiterDashboard: React.FC = () => {
     (table) =>
       table.number.toString().includes(searchQuery) ||
       table.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      table.status.toLowerCase().includes(searchQuery.toLowerCase())
+      table.status.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleTableClick = (table: Table) => {

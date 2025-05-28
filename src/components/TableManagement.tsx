@@ -1,8 +1,15 @@
-
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Table as TableType } from "@/types";
+import { TableStatus, Table as TableType } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +51,7 @@ const TableManagement: React.FC = () => {
   const [formData, setFormData] = useState({
     number: 1,
     capacity: 2,
-    status: "available" as const,
+    status: "available" as TableStatus,
   });
 
   useEffect(() => {
@@ -79,7 +86,9 @@ const TableManagement: React.FC = () => {
     try {
       // Check if table number already exists (when creating new table)
       if (!editingTable) {
-        const existingTable = tables.find(table => table.number === formData.number);
+        const existingTable = tables.find(
+          (table) => table.number === formData.number,
+        );
         if (existingTable) {
           toast({
             title: "Error",
@@ -158,8 +167,9 @@ const TableManagement: React.FC = () => {
   const openAddDialog = () => {
     resetForm();
     // Set next available table number
-    const maxNumber = tables.length > 0 ? Math.max(...tables.map(t => t.number)) : 0;
-    setFormData(prev => ({ ...prev, number: maxNumber + 1 }));
+    const maxNumber =
+      tables.length > 0 ? Math.max(...tables.map((t) => t.number)) : 0;
+    setFormData((prev) => ({ ...prev, number: maxNumber + 1 }));
     setIsDialogOpen(true);
   };
 
@@ -198,7 +208,10 @@ const TableManagement: React.FC = () => {
           <CardTitle>Table Management</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="bg-blue-500 hover:bg-blue-600">
+              <Button
+                onClick={openAddDialog}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Table
               </Button>
@@ -217,7 +230,12 @@ const TableManagement: React.FC = () => {
                     type="number"
                     min="1"
                     value={formData.number}
-                    onChange={(e) => setFormData({ ...formData, number: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        number: Number(e.target.value),
+                      })
+                    }
                     required
                   />
                 </div>
@@ -229,7 +247,12 @@ const TableManagement: React.FC = () => {
                     min="1"
                     max="20"
                     value={formData.capacity}
-                    onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        capacity: Number(e.target.value),
+                      })
+                    }
                     required
                   />
                 </div>
@@ -237,9 +260,9 @@ const TableManagement: React.FC = () => {
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: "available" | "occupied" | "reserved") => 
-                      setFormData({ ...formData, status: value })
-                    }
+                    onValueChange={(
+                      value: "available" | "occupied" | "reserved",
+                    ) => setFormData({ ...formData, status: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
@@ -260,7 +283,11 @@ const TableManagement: React.FC = () => {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={submitting} className="flex-1">
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1"
+                  >
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
@@ -286,16 +313,16 @@ const TableManagement: React.FC = () => {
           <TableBody>
             {tables.map((table) => (
               <TableRow key={table.id}>
-                <TableCell className="font-medium">Table {table.number}</TableCell>
+                <TableCell className="font-medium">
+                  Table {table.number}
+                </TableCell>
                 <TableCell>{table.capacity} seats</TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(table.status)}>
                     {table.status}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  {table.guestName || "-"}
-                </TableCell>
+                <TableCell>{table.guestName || "-"}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
@@ -309,7 +336,9 @@ const TableManagement: React.FC = () => {
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDelete(table.id)}
-                      disabled={deletingId === table.id || table.status === "occupied"}
+                      disabled={
+                        deletingId === table.id || table.status === "occupied"
+                      }
                     >
                       {deletingId === table.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
