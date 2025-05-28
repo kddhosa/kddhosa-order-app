@@ -7,9 +7,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import Layout from './Layout';
 import TableCard from './TableCard';
 import GuestRegistrationModal from './GuestRegistrationModal';
+import MenuOrderScreen from './MenuOrderScreen';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WaiterDashboard: React.FC = () => {
@@ -17,6 +18,7 @@ const WaiterDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
+  const [showMenuScreen, setShowMenuScreen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -58,11 +60,8 @@ const WaiterDashboard: React.FC = () => {
       setSelectedTable(table);
       setShowGuestModal(true);
     } else {
-      // Navigate to order management (we'll implement this later)
-      toast({
-        title: "Order Management",
-        description: `Opening orders for Table ${table.number}`,
-      });
+      setSelectedTable(table);
+      setShowMenuScreen(true);
     }
   };
 
@@ -84,7 +83,7 @@ const WaiterDashboard: React.FC = () => {
       });
 
       setShowGuestModal(false);
-      setSelectedTable(null);
+      setShowMenuScreen(true);
     } catch (error) {
       console.error('Error updating table:', error);
       toast({
@@ -94,6 +93,37 @@ const WaiterDashboard: React.FC = () => {
       });
     }
   };
+
+  const handleOrderSubmitted = () => {
+    setShowMenuScreen(false);
+    setSelectedTable(null);
+  };
+
+  const handleBackToTables = () => {
+    setShowMenuScreen(false);
+    setSelectedTable(null);
+  };
+
+  if (showMenuScreen && selectedTable) {
+    return (
+      <div>
+        <div className="p-4 bg-white border-b">
+          <Button
+            onClick={handleBackToTables}
+            variant="outline"
+            className="mb-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Tables
+          </Button>
+        </div>
+        <MenuOrderScreen
+          table={selectedTable}
+          onOrderSubmitted={handleOrderSubmitted}
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return (

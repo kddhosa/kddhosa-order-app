@@ -1,12 +1,124 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, query, onSnapshot, doc, updateDoc, addDoc, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Order, Table, Bill } from '@/types';
 import Layout from './Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DollarSign, Clock, Users, FileText, TrendingUp } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import BillGenerationModal from './BillGenerationModal';
 
 const ReceptionDashboard: React.FC = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [tables, setTables] = useState<Table[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
+  const [showBillModal, setShowBillModal] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Fetch today's orders
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const ordersQuery = query(
+      collection(db, 'orders')
+    );
+    
+    const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
+      const ordersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        updatedAt: doc.data().updatedAt?.toDate(),
+        servedAt: doc.data().servedAt?.toDate(),
+      })) as Order[];
+      
+      // Filter today's orders
+      const todayOrders = ordersData.filter(order => 
+        order.createdAt >= today
+      );
+      
+      setOrders(todayOrders);
+    });
+
+    // Fetch tables
+    const tablesQuery = query(collection(db, 'tables'));
+    const unsubscribeTables = onSnapshot(tablesQuery, (snapshot) => {
+      const tablesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        occupiedAt: doc.data().occupiedAt?.toDate(),
+      })) as Table[];
+      
+      setTables(tablesData);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeOrders();
+      unsubscribeTables();
+    };
+  }, []);
+
+  const getActiveTables = () => {
+    return tables.filter(table => table.status === 'occupied');
+  };
+
+  const getTodaysRevenue = () => {
+    return orders
+      .filter(order => order.status === 'served')
+      .reduce((total, order) => total + order.totalAmount, 0);
+  };
+
+  const getAverageOrderValue = () => {
+    const servedOrders = orders.filter(order => order.status === 'served');
+    if (servedOrders.length === 0) return 0;
+    return getTodaysRevenue() / servedOrders.length;
+  };
+
+  const getTableOrders = (tableId: string) => {
+    return orders.filter(order => order.tableId === tableId && order.status !== 'served');
+  };
+
+  const getTableTotal = (tableId: string) => {
+    return getTableOrders(tableId).reduce((total, order) => total + order.totalAmount, 0);
+  };
+
+  const handleGenerateBill = (table: Table) => {
+    setSelectedTable(table);
+    setShowBillModal(true);
+  };
+
+  const getRecentOrders = () => {
+    return orders
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 4);
+  };
+
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes === 1) return '1 min ago';
+    return `${minutes} min ago`;
+  };
+
+  if (loading) {
+    return (
+      <Layout title="Reception Dashboard">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="Reception Dashboard">
       <div className="space-y-6">
@@ -17,7 +129,7 @@ const ReceptionDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm font-medium">Today's Revenue</p>
-                  <p className="text-3xl font-bold">$2,847</p>
+                  <p className="text-3xl font-bold">${getTodaysRevenue().toFixed(2)}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-green-200" />
               </div>
@@ -29,7 +141,7 @@ const ReceptionDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm font-medium">Orders Today</p>
-                  <p className="text-3xl font-bold">156</p>
+                  <p className="text-3xl font-bold">{orders.length}</p>
                 </div>
                 <FileText className="h-8 w-8 text-blue-200" />
               </div>
@@ -41,7 +153,7 @@ const ReceptionDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-orange-100 text-sm font-medium">Active Tables</p>
-                  <p className="text-3xl font-bold">12</p>
+                  <p className="text-3xl font-bold">{getActiveTables().length}</p>
                 </div>
                 <Users className="h-8 w-8 text-orange-200" />
               </div>
@@ -53,7 +165,7 @@ const ReceptionDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm font-medium">Avg Order Value</p>
-                  <p className="text-3xl font-bold">$18.25</p>
+                  <p className="text-3xl font-bold">${getAverageOrderValue().toFixed(2)}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-purple-200" />
               </div>
@@ -61,7 +173,7 @@ const ReceptionDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Active Tables & Bills */}
+        {/* Active Tables & Recent Orders */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -72,25 +184,35 @@ const ReceptionDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { table: 3, guest: 'Sarah Johnson', amount: 89.50, time: '45 min' },
-                  { table: 5, guest: 'John Smith', amount: 67.25, time: '23 min' },
-                  { table: 8, guest: 'Mike Davis', amount: 34.75, time: '12 min' },
-                ].map((item) => (
-                  <div key={item.table} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Table {item.table}</p>
-                      <p className="text-sm text-gray-600">{item.guest}</p>
+                {getActiveTables().map((table) => {
+                  const tableTotal = getTableTotal(table.id);
+                  const timeOccupied = table.occupiedAt ? 
+                    Math.floor((new Date().getTime() - table.occupiedAt.getTime()) / (1000 * 60)) : 0;
+                  
+                  return (
+                    <div key={table.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">Table {table.number}</p>
+                        <p className="text-sm text-gray-600">{table.guestName}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${tableTotal.toFixed(2)}</p>
+                        <p className="text-sm text-gray-600">{timeOccupied} min</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={() => handleGenerateBill(table)}
+                        disabled={tableTotal === 0}
+                      >
+                        Generate Bill
+                      </Button>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">${item.amount}</p>
-                      <p className="text-sm text-gray-600">{item.time}</p>
-                    </div>
-                    <Button size="sm" className="bg-green-500 hover:bg-green-600">
-                      Generate Bill
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
+                {getActiveTables().length === 0 && (
+                  <p className="text-gray-500 text-center py-8">No active tables</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -104,16 +226,11 @@ const ReceptionDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { id: '#001', table: 5, status: 'preparing', time: '2 min ago' },
-                  { id: '#002', table: 3, status: 'ready', time: '8 min ago' },
-                  { id: '#003', table: 8, status: 'served', time: '12 min ago' },
-                  { id: '#004', table: 1, status: 'pending', time: '15 min ago' },
-                ].map((order) => (
+                {getRecentOrders().map((order) => (
                   <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium">{order.id}</p>
-                      <p className="text-sm text-gray-600">Table {order.table}</p>
+                      <p className="font-medium">#{order.id.slice(-6)}</p>
+                      <p className="text-sm text-gray-600">Table {order.tableNumber}</p>
                     </div>
                     <div className="text-right">
                       <Badge 
@@ -127,15 +244,30 @@ const ReceptionDashboard: React.FC = () => {
                       >
                         {order.status}
                       </Badge>
-                      <p className="text-sm text-gray-600 mt-1">{order.time}</p>
+                      <p className="text-sm text-gray-600 mt-1">{getTimeAgo(order.createdAt)}</p>
                     </div>
                   </div>
                 ))}
+                {getRecentOrders().length === 0 && (
+                  <p className="text-gray-500 text-center py-8">No recent orders</p>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {selectedTable && (
+        <BillGenerationModal
+          isOpen={showBillModal}
+          onClose={() => {
+            setShowBillModal(false);
+            setSelectedTable(null);
+          }}
+          table={selectedTable}
+          orders={getTableOrders(selectedTable.id)}
+        />
+      )}
     </Layout>
   );
 };
