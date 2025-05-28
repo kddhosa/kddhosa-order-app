@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -23,7 +23,7 @@ const Index = () => {
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Bliss Foods</h1>
         <p className="text-xl text-gray-600">Restaurant Management System</p>
         <p className="text-sm text-gray-500 mt-4">
-          {user ? `Welcome ${user.email}` : 'Please authenticate to continue'}
+          {user ? `Welcome ${user.email}` : "Please authenticate to continue"}
         </p>
       </div>
     </div>

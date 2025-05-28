@@ -1,14 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, doc, updateDoc, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Order } from '@/types';
-import Layout from './Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import {
+  collection,
+  query,
+  onSnapshot,
+  doc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Order } from "@/types";
+import Layout from "./Layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Clock, ChefHat, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const ChefDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -17,39 +23,48 @@ const ChefDashboard: React.FC = () => {
 
   useEffect(() => {
     const q = query(
-      collection(db, 'orders'),
-      where('status', 'in', ['pending', 'preparing', 'ready'])
+      collection(db, "orders"),
+      where("status", "in", ["pending", "preparing", "ready"]),
     );
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const ordersData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        updatedAt: doc.data().updatedAt?.toDate(),
-        servedAt: doc.data().servedAt?.toDate(),
-      })) as Order[];
-      
-      // Sort by creation time
-      ordersData.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-      setOrders(ordersData);
-      setLoading(false);
-    }, (error) => {
-      console.error('Error fetching orders:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load orders. Please refresh the page.",
-        variant: "destructive",
-      });
-      setLoading(false);
-    });
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const ordersData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate(),
+          updatedAt: doc.data().updatedAt?.toDate(),
+          servedAt: doc.data().servedAt?.toDate(),
+        })) as Order[];
+
+        // Sort by creation time
+        ordersData.sort(
+          (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+        );
+        setOrders(ordersData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching orders:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load orders. Please refresh the page.",
+          variant: "destructive",
+        });
+        setLoading(false);
+      },
+    );
 
     return unsubscribe;
   }, [toast]);
 
-  const updateOrderStatus = async (orderId: string, newStatus: 'preparing' | 'ready') => {
+  const updateOrderStatus = async (
+    orderId: string,
+    newStatus: "preparing" | "ready",
+  ) => {
     try {
-      await updateDoc(doc(db, 'orders', orderId), {
+      await updateDoc(doc(db, "orders", orderId), {
         status: newStatus,
         updatedAt: new Date(),
       });
@@ -59,7 +74,7 @@ const ChefDashboard: React.FC = () => {
         description: `Order status changed to ${newStatus}`,
       });
     } catch (error) {
-      console.error('Error updating order:', error);
+      console.error("Error updating order:", error);
       toast({
         title: "Error",
         description: "Failed to update order status",
@@ -72,14 +87,14 @@ const ChefDashboard: React.FC = () => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
-    
-    if (minutes < 1) return 'Just now';
-    if (minutes === 1) return '1 min ago';
+
+    if (minutes < 1) return "Just now";
+    if (minutes === 1) return "1 min ago";
     return `${minutes} min ago`;
   };
 
   const getOrdersByStatus = (status: string) => {
-    return orders.filter(order => order.status === status);
+    return orders.filter((order) => order.status === status);
   };
 
   if (loading) {
@@ -99,15 +114,19 @@ const ChefDashboard: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <Clock className="h-5 w-5 mr-2 text-orange-500" />
-            New Orders ({getOrdersByStatus('pending').length})
+            New Orders ({getOrdersByStatus("pending").length})
           </h3>
           <div className="space-y-4">
-            {getOrdersByStatus('pending').map((order) => (
+            {getOrdersByStatus("pending").map((order) => (
               <Card key={order.id} className="bg-orange-50 border-orange-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Table {order.tableNumber}</CardTitle>
-                    <Badge variant="secondary">{getTimeAgo(order.createdAt)}</Badge>
+                    <CardTitle className="text-lg">
+                      Table {order.tableNumber}
+                    </CardTitle>
+                    <Badge variant="secondary">
+                      {getTimeAgo(order.createdAt)}
+                    </Badge>
                   </div>
                   <p className="text-sm text-gray-600">{order.guestName}</p>
                 </CardHeader>
@@ -115,16 +134,20 @@ const ChefDashboard: React.FC = () => {
                   <div className="space-y-2 mb-4">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
-                        <span>{item.quantity}x {item.name}</span>
+                        <span>
+                          {item.quantity}x {item.name}
+                        </span>
                         {item.notes && (
-                          <span className="text-gray-500 italic">({item.notes})</span>
+                          <span className="text-gray-500 italic">
+                            ({item.notes})
+                          </span>
                         )}
                       </div>
                     ))}
                   </div>
-                  <Button 
+                  <Button
                     className="w-full bg-orange-500 hover:bg-orange-600"
-                    onClick={() => updateOrderStatus(order.id, 'preparing')}
+                    onClick={() => updateOrderStatus(order.id, "preparing")}
                   >
                     <ChefHat className="h-4 w-4 mr-2" />
                     Start Preparing
@@ -132,7 +155,7 @@ const ChefDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
-            {getOrdersByStatus('pending').length === 0 && (
+            {getOrdersByStatus("pending").length === 0 && (
               <p className="text-gray-500 text-center py-8">No new orders</p>
             )}
           </div>
@@ -142,15 +165,20 @@ const ChefDashboard: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <ChefHat className="h-5 w-5 mr-2 text-blue-500" />
-            Preparing ({getOrdersByStatus('preparing').length})
+            Preparing ({getOrdersByStatus("preparing").length})
           </h3>
           <div className="space-y-4">
-            {getOrdersByStatus('preparing').map((order) => (
+            {getOrdersByStatus("preparing").map((order) => (
               <Card key={order.id} className="bg-blue-50 border-blue-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Table {order.tableNumber}</CardTitle>
-                    <Badge variant="outline" className="border-blue-300 text-blue-700">
+                    <CardTitle className="text-lg">
+                      Table {order.tableNumber}
+                    </CardTitle>
+                    <Badge
+                      variant="outline"
+                      className="border-blue-300 text-blue-700"
+                    >
                       {getTimeAgo(order.updatedAt)}
                     </Badge>
                   </div>
@@ -160,16 +188,20 @@ const ChefDashboard: React.FC = () => {
                   <div className="space-y-2 mb-4">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
-                        <span>{item.quantity}x {item.name}</span>
+                        <span>
+                          {item.quantity}x {item.name}
+                        </span>
                         {item.notes && (
-                          <span className="text-gray-500 italic">({item.notes})</span>
+                          <span className="text-gray-500 italic">
+                            ({item.notes})
+                          </span>
                         )}
                       </div>
                     ))}
                   </div>
-                  <Button 
+                  <Button
                     className="w-full bg-blue-500 hover:bg-blue-600"
-                    onClick={() => updateOrderStatus(order.id, 'ready')}
+                    onClick={() => updateOrderStatus(order.id, "ready")}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Mark Ready
@@ -177,8 +209,10 @@ const ChefDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
-            {getOrdersByStatus('preparing').length === 0 && (
-              <p className="text-gray-500 text-center py-8">No orders in preparation</p>
+            {getOrdersByStatus("preparing").length === 0 && (
+              <p className="text-gray-500 text-center py-8">
+                No orders in preparation
+              </p>
             )}
           </div>
         </div>
@@ -187,15 +221,20 @@ const ChefDashboard: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
-            Ready for Pickup ({getOrdersByStatus('ready').length})
+            Ready for Pickup ({getOrdersByStatus("ready").length})
           </h3>
           <div className="space-y-4">
-            {getOrdersByStatus('ready').map((order) => (
+            {getOrdersByStatus("ready").map((order) => (
               <Card key={order.id} className="bg-green-50 border-green-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Table {order.tableNumber}</CardTitle>
-                    <Badge variant="outline" className="border-green-300 text-green-700">
+                    <CardTitle className="text-lg">
+                      Table {order.tableNumber}
+                    </CardTitle>
+                    <Badge
+                      variant="outline"
+                      className="border-green-300 text-green-700"
+                    >
                       Ready
                     </Badge>
                   </div>
@@ -205,7 +244,9 @@ const ChefDashboard: React.FC = () => {
                   <div className="space-y-2 mb-4">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
-                        <span>{item.quantity}x {item.name}</span>
+                        <span>
+                          {item.quantity}x {item.name}
+                        </span>
                         <span className="text-green-600">✓</span>
                       </div>
                     ))}
@@ -216,7 +257,7 @@ const ChefDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
-            {getOrdersByStatus('ready').length === 0 && (
+            {getOrdersByStatus("ready").length === 0 && (
               <p className="text-gray-500 text-center py-8">No orders ready</p>
             )}
           </div>

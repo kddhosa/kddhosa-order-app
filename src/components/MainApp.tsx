@@ -1,9 +1,8 @@
-
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import WaiterDashboard from './WaiterDashboard';
-import ChefDashboard from './ChefDashboard';
-import ReceptionDashboard from './ReceptionDashboard';
+import React from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import WaiterDashboard from "./WaiterDashboard";
+import ChefDashboard from "./ChefDashboard";
+import ReceptionDashboard from "./ReceptionDashboard";
 
 const MainApp: React.FC = () => {
   const { user } = useAuth();
@@ -13,11 +12,11 @@ const MainApp: React.FC = () => {
   }
 
   switch (user.role) {
-    case 'waiter':
+    case "waiter":
       return <WaiterDashboard />;
-    case 'chef':
+    case "chef":
       return <ChefDashboard />;
-    case 'reception':
+    case "reception":
       return <ReceptionDashboard />;
     default:
       return (

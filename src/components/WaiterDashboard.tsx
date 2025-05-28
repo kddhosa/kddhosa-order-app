@@ -1,21 +1,27 @@
-
-import React, { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, doc, updateDoc, addDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Table } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import Layout from './Layout';
-import TableCard from './TableCard';
-import GuestRegistrationModal from './GuestRegistrationModal';
-import MenuOrderScreen from './MenuOrderScreen';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Plus, ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import {
+  collection,
+  query,
+  onSnapshot,
+  doc,
+  updateDoc,
+  addDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Table } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import Layout from "./Layout";
+import TableCard from "./TableCard";
+import GuestRegistrationModal from "./GuestRegistrationModal";
+import MenuOrderScreen from "./MenuOrderScreen";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Plus, ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const WaiterDashboard: React.FC = () => {
   const [tables, setTables] = useState<Table[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [showMenuScreen, setShowMenuScreen] = useState(false);
@@ -24,39 +30,44 @@ const WaiterDashboard: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const q = query(collection(db, 'tables'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tablesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        occupiedAt: doc.data().occupiedAt?.toDate(),
-      })) as Table[];
-      
-      // Sort by table number
-      tablesData.sort((a, b) => a.number - b.number);
-      setTables(tablesData);
-      setLoading(false);
-    }, (error) => {
-      console.error('Error fetching tables:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load tables. Please refresh the page.",
-        variant: "destructive",
-      });
-      setLoading(false);
-    });
+    const q = query(collection(db, "tables"));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const tablesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          occupiedAt: doc.data().occupiedAt?.toDate(),
+        })) as Table[];
+
+        // Sort by table number
+        tablesData.sort((a, b) => a.number - b.number);
+        setTables(tablesData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching tables:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load tables. Please refresh the page.",
+          variant: "destructive",
+        });
+        setLoading(false);
+      },
+    );
 
     return unsubscribe;
   }, [toast]);
 
-  const filteredTables = tables.filter(table =>
-    table.number.toString().includes(searchQuery) ||
-    table.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    table.status.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTables = tables.filter(
+    (table) =>
+      table.number.toString().includes(searchQuery) ||
+      table.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      table.status.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleTableClick = (table: Table) => {
-    if (table.status === 'available') {
+    if (table.status === "available") {
       setSelectedTable(table);
       setShowGuestModal(true);
     } else {
@@ -65,12 +76,17 @@ const WaiterDashboard: React.FC = () => {
     }
   };
 
-  const handleGuestRegistration = async (guestData: { name: string; phone: string; guests: number; notes?: string }) => {
+  const handleGuestRegistration = async (guestData: {
+    name: string;
+    phone: string;
+    guests: number;
+    notes?: string;
+  }) => {
     if (!selectedTable || !user) return;
 
     try {
-      await updateDoc(doc(db, 'tables', selectedTable.id), {
-        status: 'occupied',
+      await updateDoc(doc(db, "tables", selectedTable.id), {
+        status: "occupied",
         guestName: guestData.name,
         guestPhone: guestData.phone,
         occupiedAt: new Date(),
@@ -85,7 +101,7 @@ const WaiterDashboard: React.FC = () => {
       setShowGuestModal(false);
       setShowMenuScreen(true);
     } catch (error) {
-      console.error('Error updating table:', error);
+      console.error("Error updating table:", error);
       toast({
         title: "Error",
         description: "Failed to assign table. Please try again.",
@@ -148,7 +164,7 @@ const WaiterDashboard: React.FC = () => {
               className="pl-10 bg-white/80 border-orange-200 focus:border-orange-400"
             />
           </div>
-          
+
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-green-400"></div>
@@ -177,7 +193,9 @@ const WaiterDashboard: React.FC = () => {
 
         {filteredTables.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No tables found matching your search.</p>
+            <p className="text-gray-500 text-lg">
+              No tables found matching your search.
+            </p>
           </div>
         )}
       </div>

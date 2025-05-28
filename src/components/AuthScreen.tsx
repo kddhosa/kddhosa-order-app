@@ -1,10 +1,15 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogIn, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthScreen: React.FC = () => {
   const { signInWithGoogle } = useAuth();
@@ -18,7 +23,8 @@ const AuthScreen: React.FC = () => {
     } catch (error) {
       toast({
         title: "Authentication Failed",
-        description: "Unable to sign in. Please check if your email is authorized.",
+        description:
+          "Unable to sign in. Please check if your email is authorized.",
         variant: "destructive",
       });
     } finally {
@@ -30,15 +36,15 @@ const AuthScreen: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Bliss Foods
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Bliss Foods</h1>
           <p className="text-lg text-gray-600">Restaurant Management System</p>
         </div>
-        
+
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-gray-900">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl text-gray-900">
+              Welcome Back
+            </CardTitle>
             <CardDescription>
               Sign in with your authorized Google account to continue
             </CardDescription>
@@ -57,7 +63,7 @@ const AuthScreen: React.FC = () => {
               )}
               Sign in with Google
             </Button>
-            
+
             <div className="mt-6 text-center text-sm text-gray-500">
               <p>Only authorized restaurant staff can access this system</p>
             </div>

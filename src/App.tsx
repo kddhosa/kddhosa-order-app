@@ -1,7 +1,6 @@
-
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import AuthScreen from '@/components/AuthScreen';
-import MainApp from '@/components/MainApp';
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import AuthScreen from "@/components/AuthScreen";
+import MainApp from "@/components/MainApp";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";

@@ -1,9 +1,8 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogOut, User } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,14 +14,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'waiter':
-        return 'bg-blue-100 text-blue-800';
-      case 'chef':
-        return 'bg-green-100 text-green-800';
-      case 'reception':
-        return 'bg-purple-100 text-purple-800';
+      case "waiter":
+        return "bg-blue-100 text-blue-800";
+      case "chef":
+        return "bg-green-100 text-green-800";
+      case "reception":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -36,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
               <span className="text-lg text-gray-600">•</span>
               <h2 className="text-xl text-gray-700">{title}</h2>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <Card className="bg-white/60 border-0 px-3 py-2">
                 <div className="flex items-center space-x-2">
@@ -44,12 +43,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
                   <span className="text-sm font-medium text-gray-700">
                     {user?.displayName || user?.email}
                   </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user?.role || '')}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user?.role || "")}`}
+                  >
                     {user?.role?.toUpperCase()}
                   </span>
                 </div>
               </Card>
-              
+
               <Button
                 onClick={logout}
                 variant="outline"
@@ -63,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           </div>
         </div>
       </header>
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>

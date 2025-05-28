@@ -1,9 +1,13 @@
-
-export type TableStatus = 'available' | 'occupied' | 'reserved';
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served';
-export type BillStatus = 'pending' | 'paid';
-export type PaymentMethod = 'cash' | 'card';
-export type UserRole = 'waiter' | 'chef' | 'reception';
+export type TableStatus = "available" | "occupied" | "reserved";
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "preparing"
+  | "ready"
+  | "served";
+export type BillStatus = "pending" | "paid";
+export type PaymentMethod = "cash" | "card";
+export type UserRole = "waiter" | "chef" | "reception";
 
 export interface Table {
   id: string;

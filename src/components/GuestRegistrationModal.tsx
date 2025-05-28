@@ -1,16 +1,25 @@
-
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { User, Phone, Users, MessageSquare } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { User, Phone, Users, MessageSquare } from "lucide-react";
 
 interface GuestRegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; phone: string; guests: number; notes?: string }) => void;
+  onSubmit: (data: {
+    name: string;
+    phone: string;
+    guests: number;
+    notes?: string;
+  }) => void;
   tableNumber?: number;
 }
 
@@ -21,10 +30,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
   tableNumber,
 }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
+    name: "",
+    phone: "",
     guests: 1,
-    notes: '',
+    notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -32,17 +41,17 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Guest name is required';
+      newErrors.name = "Guest name is required";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = "Phone number is required";
     } else if (!/^\+?[\d\s\-\(\)]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = "Please enter a valid phone number";
     }
 
     if (formData.guests < 1) {
-      newErrors.guests = 'Number of guests must be at least 1';
+      newErrors.guests = "Number of guests must be at least 1";
     }
 
     setErrors(newErrors);
@@ -51,17 +60,17 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       onSubmit(formData);
       // Reset form
-      setFormData({ name: '', phone: '', guests: 1, notes: '' });
+      setFormData({ name: "", phone: "", guests: 1, notes: "" });
       setErrors({});
     }
   };
 
   const handleClose = () => {
-    setFormData({ name: '', phone: '', guests: 1, notes: '' });
+    setFormData({ name: "", phone: "", guests: 1, notes: "" });
     setErrors({});
     onClose();
   };
@@ -87,8 +96,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
                 type="text"
                 placeholder="Enter guest name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className={`pl-10 ${errors.name ? 'border-red-500 focus:border-red-500' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className={`pl-10 ${errors.name ? "border-red-500 focus:border-red-500" : ""}`}
               />
             </div>
             {errors.name && (
@@ -97,7 +108,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="phone"
+              className="text-sm font-medium text-gray-700"
+            >
               Phone Number *
             </Label>
             <div className="relative">
@@ -107,8 +121,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
                 type="tel"
                 placeholder="+1 (555) 123-4567"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className={`pl-10 ${errors.phone ? 'border-red-500 focus:border-red-500' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                className={`pl-10 ${errors.phone ? "border-red-500 focus:border-red-500" : ""}`}
               />
             </div>
             {errors.phone && (
@@ -117,7 +133,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="guests" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="guests"
+              className="text-sm font-medium text-gray-700"
+            >
               Number of Guests
             </Label>
             <div className="relative">
@@ -128,8 +147,13 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
                 min="1"
                 placeholder="1"
                 value={formData.guests}
-                onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 1 })}
-                className={`pl-10 ${errors.guests ? 'border-red-500 focus:border-red-500' : ''}`}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    guests: parseInt(e.target.value) || 1,
+                  })
+                }
+                className={`pl-10 ${errors.guests ? "border-red-500 focus:border-red-500" : ""}`}
               />
             </div>
             {errors.guests && (
@@ -138,7 +162,10 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="notes"
+              className="text-sm font-medium text-gray-700"
+            >
               Special Requests (Optional)
             </Label>
             <div className="relative">
@@ -147,7 +174,9 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
                 id="notes"
                 placeholder="Any special requests or notes..."
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 className="pl-10 min-h-[80px]"
               />
             </div>
