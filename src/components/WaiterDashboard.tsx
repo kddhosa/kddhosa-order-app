@@ -81,11 +81,20 @@ const WaiterDashboard: React.FC = () => {
         servedAt: doc.data().servedAt?.toDate(),
       })) as Order[];
 
-      setReadyOrders(orders);
+      // Filter to only show orders from current active sessions
+      const activeSessionOrders = orders.filter(order => {
+        const table = tables.find(t => t.id === order.tableId);
+        if (!table || !table.occupiedAt) return false;
+        
+        const sessionId = table.occupiedAt.getTime().toString();
+        return order.sessionId === sessionId;
+      });
+
+      setReadyOrders(activeSessionOrders);
     });
 
     return unsubscribeOrders;
-  }, [user]);
+  }, [user, tables]);
 
   const filteredTables = tables.filter(
     (table) =>

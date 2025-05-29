@@ -1,3 +1,4 @@
+
 export type TableStatus = "available" | "occupied" | "reserved";
 export type OrderStatus =
   | "pending"
@@ -46,10 +47,12 @@ export interface Order {
   tableId: string;
   tableNumber: number;
   guestName: string;
+  sessionId: string; // Using occupiedAt timestamp as unique session identifier
   waiterId: string;
   items: OrderItem[];
   status: OrderStatus;
   totalAmount: number;
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
   servedAt?: Date;
@@ -60,6 +63,7 @@ export interface Bill {
   tableId: string;
   tableNumber: number;
   guestName: string;
+  sessionId: string; // Match the session from orders
   orders: string[];
   items: OrderItem[];
   subtotal: number;

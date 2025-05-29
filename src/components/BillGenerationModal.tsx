@@ -34,13 +34,13 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const { toast } = useToast();
   const { gst } = useMenu();
 
-  // Filter orders to only include current guest session
+  // Filter orders to only include current session using sessionId
   const getCurrentSessionOrders = () => {
     if (!table.occupiedAt) return [];
     
+    const sessionId = table.occupiedAt.getTime().toString();
     return orders.filter((order) => {
-      return order.createdAt >= table.occupiedAt! && 
-             order.guestName === table.guestName;
+      return order.sessionId === sessionId;
     });
   };
 
@@ -69,11 +69,14 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const handlePayment = async () => {
     setProcessing(true);
     try {
+      const sessionId = table.occupiedAt!.getTime().toString();
+      
       // Create bill
       const billData: Omit<Bill, "id"> = {
         tableId: table.id,
         tableNumber: table.number,
         guestName: table.guestName!,
+        sessionId: sessionId,
         orders: currentSessionOrders.map((order) => order.id),
         items: getAllItems(),
         subtotal: getSubtotal(),

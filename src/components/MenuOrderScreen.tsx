@@ -28,6 +28,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const { menuItems, categories, loading } = useMenu();
+  const [orderNotes, setOrderNotes] = useState("");
 
   const addToOrder = (menuItem: MenuItem) => {
     const existingItem = orderItems.find((item) => item.id === menuItem.id);
@@ -88,14 +89,18 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
 
     setSubmitting(true);
     try {
+      const sessionId = table.occupiedAt!.getTime().toString();
+      
       await addDoc(collection(db, "orders"), {
         tableId: table.id,
         tableNumber: table.number,
         guestName: table.guestName,
+        sessionId: sessionId,
         waiterId: user?.uid,
         items: orderItems,
         status: "pending",
         totalAmount: getTotalAmount(),
+        notes: orderNotes,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -106,6 +111,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
       });
 
       setOrderItems([]);
+      setOrderNotes("");
       onOrderSubmitted();
     } catch (error) {
       console.error("Error submitting order:", error);
