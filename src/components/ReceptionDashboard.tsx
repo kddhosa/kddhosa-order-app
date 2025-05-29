@@ -207,8 +207,8 @@ const ReceptionDashboard: React.FC = () => {
         <AnalyticsDialog />
       </div>
 
-      <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="menu-management">
             <UtensilsCrossed className="h-4 w-4 mr-2" />
@@ -424,7 +424,7 @@ const ReceptionDashboard: React.FC = () => {
                     <div className="flex items-center justify-between w-full mr-4">
                       <span>Paid Bills ({getPaidBills().length})</span>
                       <span className="text-green-600 font-semibold">
-                        $
+                        ₹
                         {getPaidBills()
                           .reduce((sum, bill) => sum + bill.total, 0)
                           .toFixed(2)}
@@ -482,7 +482,7 @@ const ReceptionDashboard: React.FC = () => {
                     <div className="flex items-center justify-between w-full mr-4">
                       <span>Pending Bills ({getPendingBills().length})</span>
                       <span className="text-orange-600 font-semibold">
-                        $
+                        ₹
                         {getPendingBills()
                           .reduce((sum, bill) => sum + bill.total, 0)
                           .toFixed(2)}

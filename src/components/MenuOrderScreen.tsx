@@ -135,12 +135,12 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   }
 
   return (
-    <Layout title={`Order for Table ${table.number} - ${table.guestName}`}>
+    <Layout title={`Order for Table ${table.number}`}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menu Items */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="appetizers" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid grid-cols-1 lg:grid-cols-4 h-auto">
               {categories.map(({ id, category }) => (
                 <TabsTrigger key={id} value={category} className="capitalize">
                   {category.replace("_", " ")}
