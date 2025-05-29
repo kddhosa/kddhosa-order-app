@@ -87,15 +87,22 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
       return;
     }
 
+    if (!table.sessionId) {
+      toast({
+        title: "Error",
+        description: "Invalid table session. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const sessionId = table.occupiedAt!.getTime().toString();
-      
       await addDoc(collection(db, "orders"), {
         tableId: table.id,
         tableNumber: table.number,
         guestName: table.guestName,
-        sessionId: sessionId,
+        sessionId: table.sessionId,
         waiterId: user?.uid,
         items: orderItems,
         status: "pending",

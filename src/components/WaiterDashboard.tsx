@@ -22,6 +22,15 @@ import { Search, Plus, ArrowLeft, Clock, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Helper function to generate UUID
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 const WaiterDashboard: React.FC = () => {
   const [tables, setTables] = useState<Table[]>([]);
   const [readyOrders, setReadyOrders] = useState<Order[]>([]);
@@ -84,10 +93,9 @@ const WaiterDashboard: React.FC = () => {
       // Filter to only show orders from current active sessions
       const activeSessionOrders = orders.filter(order => {
         const table = tables.find(t => t.id === order.tableId);
-        if (!table || !table.occupiedAt) return false;
+        if (!table || !table.sessionId) return false;
         
-        const sessionId = table.occupiedAt.getTime().toString();
-        return order.sessionId === sessionId;
+        return order.sessionId === table.sessionId;
       });
 
       setReadyOrders(activeSessionOrders);
@@ -124,12 +132,15 @@ const WaiterDashboard: React.FC = () => {
     setOccupyingTable(selectedTable.id);
 
     try {
+      const sessionId = generateUUID();
+      
       await updateDoc(doc(db, "tables", selectedTable.id), {
         status: "occupied",
         guestName: guestData.name,
         guestPhone: guestData.phone,
         occupiedAt: new Date(),
         waiterId: user.uid,
+        sessionId: sessionId,
       });
 
       toast({

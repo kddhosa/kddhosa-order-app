@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -34,13 +33,12 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const { toast } = useToast();
   const { gst } = useMenu();
 
-  // Filter orders to only include current session using sessionId
+  // Filter orders to only include current session using table's sessionId
   const getCurrentSessionOrders = () => {
-    if (!table.occupiedAt) return [];
+    if (!table.sessionId) return [];
     
-    const sessionId = table.occupiedAt.getTime().toString();
     return orders.filter((order) => {
-      return order.sessionId === sessionId;
+      return order.sessionId === table.sessionId;
     });
   };
 
@@ -69,14 +67,16 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const handlePayment = async () => {
     setProcessing(true);
     try {
-      const sessionId = table.occupiedAt!.getTime().toString();
+      if (!table.sessionId) {
+        throw new Error("Invalid table session");
+      }
       
       // Create bill
       const billData: Omit<Bill, "id"> = {
         tableId: table.id,
         tableNumber: table.number,
         guestName: table.guestName!,
-        sessionId: sessionId,
+        sessionId: table.sessionId,
         orders: currentSessionOrders.map((order) => order.id),
         items: getAllItems(),
         subtotal: getSubtotal(),
@@ -90,13 +90,14 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
 
       await addDoc(collection(db, "bills"), billData);
 
-      // Update table status
+      // Update table status and clear sessionId
       await updateDoc(doc(db, "tables", table.id), {
         status: "available",
         guestName: null,
         guestPhone: null,
         occupiedAt: null,
         waiterId: null,
+        sessionId: null,
       });
 
       // Mark current session orders as served

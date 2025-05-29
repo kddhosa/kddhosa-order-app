@@ -133,14 +133,12 @@ const ReceptionDashboard: React.FC = () => {
 
   const getTableOrders = (tableId: string) => {
     const table = tables.find(t => t.id === tableId);
-    if (!table || !table.occupiedAt) return [];
+    if (!table || !table.sessionId) return [];
     
-    const sessionId = table.occupiedAt.getTime().toString();
-    
-    // Only return orders from current session using sessionId
+    // Only return orders from current session using table's sessionId
     return orders.filter(
       (order) => order.tableId === tableId && 
-                 order.sessionId === sessionId
+                 order.sessionId === table.sessionId
     );
   };
 
