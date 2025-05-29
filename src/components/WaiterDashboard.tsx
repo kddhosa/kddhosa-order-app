@@ -24,9 +24,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Helper function to generate UUID
 const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
@@ -66,7 +66,7 @@ const WaiterDashboard: React.FC = () => {
           variant: "destructive",
         });
         setLoading(false);
-      },
+      }
     );
 
     return unsubscribe;
@@ -77,8 +77,7 @@ const WaiterDashboard: React.FC = () => {
 
     const ordersQuery = query(
       collection(db, "orders"),
-      where("status", "==", "ready"),
-      where("waiterId", "==", user.uid),
+      where("status", "==", "ready")
     );
 
     const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
@@ -91,10 +90,10 @@ const WaiterDashboard: React.FC = () => {
       })) as Order[];
 
       // Filter to only show orders from current active sessions
-      const activeSessionOrders = orders.filter(order => {
-        const table = tables.find(t => t.id === order.tableId);
+      const activeSessionOrders = orders.filter((order) => {
+        const table = tables.find((t) => t.id === order.tableId);
         if (!table || !table.sessionId) return false;
-        
+
         return order.sessionId === table.sessionId;
       });
 
@@ -108,7 +107,7 @@ const WaiterDashboard: React.FC = () => {
     (table) =>
       table.number.toString().includes(searchQuery) ||
       table.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      table.status.toLowerCase().includes(searchQuery.toLowerCase()),
+      table.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTableClick = (table: Table) => {
@@ -130,17 +129,22 @@ const WaiterDashboard: React.FC = () => {
     if (!selectedTable || !user) return;
 
     setOccupyingTable(selectedTable.id);
+    const sessionId = generateUUID();
+
+    const selectedTableData: Table = {
+      ...selectedTable,
+      status: "occupied",
+      guestName: guestData.name,
+      guestPhone: guestData.phone,
+      occupiedAt: new Date(),
+      waiterId: user.uid,
+      sessionId: sessionId,
+    };
+    setSelectedTable((table) => ({ ...table, ...selectedTableData }));
 
     try {
-      const sessionId = generateUUID();
-      
       await updateDoc(doc(db, "tables", selectedTable.id), {
-        status: "occupied",
-        guestName: guestData.name,
-        guestPhone: guestData.phone,
-        occupiedAt: new Date(),
-        waiterId: user.uid,
-        sessionId: sessionId,
+        ...selectedTableData,
       });
 
       toast({

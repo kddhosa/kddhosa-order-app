@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,10 +33,9 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const { toast } = useToast();
   const { gst } = useMenu();
 
-  // Filter orders to only include current session using table's sessionId
   const getCurrentSessionOrders = () => {
     if (!table.sessionId) return [];
-    
+
     return orders.filter((order) => {
       return order.sessionId === table.sessionId;
     });
@@ -70,7 +69,6 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
       if (!table.sessionId) {
         throw new Error("Invalid table session");
       }
-      
       // Create bill
       const billData: Omit<Bill, "id"> = {
         tableId: table.id,
@@ -125,24 +123,6 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
     }
     setProcessing(false);
   };
-
-  if (currentSessionOrders.length === 0) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>No Orders Found</DialogTitle>
-          </DialogHeader>
-          <p className="text-center text-gray-500 py-8">
-            No orders found for current guest session at Table {table.number}
-          </p>
-          <Button onClick={onClose} className="w-full">
-            Close
-          </Button>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
