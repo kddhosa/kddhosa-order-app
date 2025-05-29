@@ -132,14 +132,20 @@ const ReceptionDashboard: React.FC = () => {
   };
 
   const getTableOrders = (tableId: string) => {
+    const table = tables.find(t => t.id === tableId);
+    if (!table || !table.occupiedAt || !table.guestName) return [];
+    
+    // Only return orders from current guest session
     return orders.filter(
-      (order) => order.tableId === tableId && order.status === "served"
+      (order) => order.tableId === tableId && 
+                 order.guestName === table.guestName &&
+                 order.createdAt >= table.occupiedAt!
     );
   };
 
   const getTableTotal = (tableId: string) => {
-    const orders = getTableOrders(tableId);
-    return orders.reduce((total, order) => total + order.totalAmount, 0);
+    const tableOrders = getTableOrders(tableId);
+    return tableOrders.reduce((total, order) => total + order.totalAmount, 0);
   };
 
   const handleGenerateBill = (table: Table) => {

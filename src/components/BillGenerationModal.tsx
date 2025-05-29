@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -33,8 +34,20 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const { toast } = useToast();
   const { gst } = useMenu();
 
+  // Filter orders to only include current guest session
+  const getCurrentSessionOrders = () => {
+    if (!table.occupiedAt) return [];
+    
+    return orders.filter((order) => {
+      return order.createdAt >= table.occupiedAt! && 
+             order.guestName === table.guestName;
+    });
+  };
+
+  const currentSessionOrders = getCurrentSessionOrders();
+
   const getAllItems = () => {
-    const items = orders.flatMap((order) => order.items);
+    const items = currentSessionOrders.flatMap((order) => order.items);
     return items;
   };
 
@@ -61,7 +74,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
         tableId: table.id,
         tableNumber: table.number,
         guestName: table.guestName!,
-        orders: orders.map((order) => order.id),
+        orders: currentSessionOrders.map((order) => order.id),
         items: getAllItems(),
         subtotal: getSubtotal(),
         tax: getTax(),
@@ -83,8 +96,8 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
         waiterId: null,
       });
 
-      // Mark all orders as served
-      for (const order of orders) {
+      // Mark current session orders as served
+      for (const order of currentSessionOrders) {
         await updateDoc(doc(db, "orders", order.id), {
           status: "served",
           servedAt: new Date(),
@@ -109,7 +122,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
     setProcessing(false);
   };
 
-  if (orders.length === 0) {
+  if (currentSessionOrders.length === 0) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
@@ -117,7 +130,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
             <DialogTitle>No Orders Found</DialogTitle>
           </DialogHeader>
           <p className="text-center text-gray-500 py-8">
-            No orders found for Table {table.number}
+            No orders found for current guest session at Table {table.number}
           </p>
           <Button onClick={onClose} className="w-full">
             Close
@@ -156,7 +169,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
           <div>
             <h3 className="font-semibold mb-4">Order Details</h3>
             <div className="space-y-4">
-              {orders.map((order, orderIndex) => (
+              {currentSessionOrders.map((order, orderIndex) => (
                 <div key={order.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-medium">
@@ -177,6 +190,11 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                       </div>
                     ))}
                   </div>
+                  {order.notes && (
+                    <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
+                      <strong>Notes:</strong> {order.notes}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
