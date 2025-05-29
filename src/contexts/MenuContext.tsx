@@ -65,9 +65,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
             ...doc.data(),
           })) as MenuItem[];
 
-          console.log({ items });
-
-          setMenuItems(items.filter((item) => item.isAvailable));
+          setMenuItems(items.filter((item) => item.name && item.price > 0));
           setLoading(false);
           setError(null);
         } catch (err) {
@@ -80,7 +78,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("Error fetching menu items:", err);
         setError("Failed to connect to menu data");
         setLoading(false);
-      },
+      }
     );
 
     fetchCategories();

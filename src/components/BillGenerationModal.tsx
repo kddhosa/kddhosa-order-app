@@ -41,7 +41,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const getSubtotal = () => {
     return getAllItems().reduce(
       (total, item) => total + item.price * item.quantity,
-      0,
+      0
     );
   };
 
@@ -173,7 +173,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                         <span>
                           {item.quantity}x {item.name}
                         </span>
-                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -188,16 +188,16 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${getSubtotal().toFixed(2)}</span>
+                <span>₹{getSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Tax (10%):</span>
-                <span>${getTax().toFixed(2)}</span>
+                <span>Tax ({gst}%):</span>
+                <span>₹{getTax().toFixed(2)}</span>
               </div>
               <Separator />
               <div className="flex justify-between text-lg font-bold">
                 <span>Total:</span>
-                <span>${getTotal().toFixed(2)}</span>
+                <span>₹{getTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>

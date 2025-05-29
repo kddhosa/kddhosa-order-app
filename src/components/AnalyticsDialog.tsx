@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -56,7 +55,14 @@ const chartConfig = {
   },
 };
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+  "#10b981",
+  "#3b82f6",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 const AnalyticsDialog: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -97,10 +103,10 @@ const AnalyticsDialog: React.FC = () => {
 
     orders.forEach((order) => {
       order.items.forEach((orderItem) => {
-        const menuItem = menuItems.find((mi) => mi.id === orderItem.menuItemId);
+        const menuItem = menuItems.find((mi) => mi.id === orderItem.id);
         if (!menuItem) return;
 
-        const key = orderItem.menuItemId;
+        const key = orderItem.id;
         const revenue = orderItem.price * orderItem.quantity;
 
         if (statsMap.has(key)) {
@@ -109,7 +115,7 @@ const AnalyticsDialog: React.FC = () => {
           existing.totalOrders += orderItem.quantity;
         } else {
           statsMap.set(key, {
-            id: orderItem.menuItemId,
+            id: orderItem.id,
             name: menuItem.name,
             totalRevenue: revenue,
             totalOrders: orderItem.quantity,
@@ -149,7 +155,7 @@ const AnalyticsDialog: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return `$${amount.toFixed(2)}`;
+    return `₹${amount.toFixed(2)}`;
   };
 
   const revenueData = getTopRevenueItems().map((item) => ({
@@ -250,14 +256,19 @@ const AnalyticsDialog: React.FC = () => {
                           <XAxis
                             dataKey="name"
                             tick={{ fontSize: 12 }}
-                            tickFormatter={(value) => 
-                              value.length > 10 ? `${value.substring(0, 10)}...` : value
+                            tickFormatter={(value) =>
+                              value.length > 10
+                                ? `${value.substring(0, 10)}...`
+                                : value
                             }
                           />
-                          <YAxis tickFormatter={(value) => `$${value}`} />
+                          <YAxis tickFormatter={(value) => `₹${value}`} />
                           <ChartTooltip
                             content={<ChartTooltipContent />}
-                            formatter={(value) => [formatCurrency(Number(value)), "Revenue"]}
+                            formatter={(value) => [
+                              formatCurrency(Number(value)),
+                              ": Revenue",
+                            ]}
                           />
                           <Bar
                             dataKey="revenue"
@@ -304,8 +315,10 @@ const AnalyticsDialog: React.FC = () => {
                           <ChartTooltip
                             content={<ChartTooltipContent />}
                             formatter={(value, name) => [
-                              `${value} orders`,
-                              popularityData.find(item => item.orders === value)?.name || name
+                              `${value} orders : `,
+                              popularityData.find(
+                                (item) => item.orders === value
+                              )?.name || name,
                             ]}
                           />
                         </PieChart>

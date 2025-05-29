@@ -36,8 +36,8 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
         orderItems.map((item) =>
           item.id === menuItem.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        ),
+            : item
+        )
       );
     } else {
       const orderItem: OrderItem = {
@@ -57,24 +57,22 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
     } else {
       setOrderItems(
         orderItems.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item,
-        ),
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        )
       );
     }
   };
 
   const updateNotes = (itemId: string, notes: string) => {
     setOrderItems(
-      orderItems.map((item) =>
-        item.id === itemId ? { ...item, notes } : item,
-      ),
+      orderItems.map((item) => (item.id === itemId ? { ...item, notes } : item))
     );
   };
 
   const getTotalAmount = () => {
     return orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
-      0,
+      0
     );
   };
 
@@ -121,7 +119,9 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   };
 
   const getMenuItemsByCategory = (category: string) => {
-    return menuItems.filter((item) => item.category === category);
+    return menuItems.filter(
+      (item) => item.category === category && item.isAvailable
+    );
   };
 
   if (loading) {
@@ -160,7 +160,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="font-semibold">{item.name}</h3>
                           <span className="text-lg font-bold text-orange-600">
-                            ${item.price}
+                            ₹{item.price}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">
@@ -209,7 +209,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
                       <div className="flex justify-between items-start mb-2">
                         <span className="font-medium">{item.name}</span>
                         <span className="font-semibold">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ₹{(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between mb-2">
@@ -237,7 +237,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
                           </Button>
                         </div>
                         <span className="text-sm text-gray-500">
-                          ${item.price} each
+                          ₹{item.price} each
                         </span>
                       </div>
                       <Textarea
@@ -252,7 +252,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
                   <div className="border-t pt-3">
                     <div className="flex justify-between items-center text-lg font-bold">
                       <span>Total:</span>
-                      <span>${getTotalAmount().toFixed(2)}</span>
+                      <span>₹{getTotalAmount().toFixed(2)}</span>
                     </div>
                   </div>
 

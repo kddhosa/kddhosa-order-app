@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -75,7 +74,7 @@ const ReceptionDashboard: React.FC = () => {
       })) as Order[];
 
       const todayOrders = ordersData.filter(
-        (order) => order.createdAt >= today,
+        (order) => order.createdAt >= today
       );
 
       setOrders(todayOrders);
@@ -96,7 +95,7 @@ const ReceptionDashboard: React.FC = () => {
     const billsQuery = query(
       collection(db, "bills"),
       orderBy("generatedAt", "desc"),
-      limit(50),
+      limit(50)
     );
     const unsubscribeBills = onSnapshot(billsQuery, (snapshot) => {
       const billsData = snapshot.docs.map((doc) => ({
@@ -134,22 +133,12 @@ const ReceptionDashboard: React.FC = () => {
 
   const getTableOrders = (tableId: string) => {
     return orders.filter(
-      (order) => order.tableId === tableId && order.status === "served",
+      (order) => order.tableId === tableId && order.status === "served"
     );
   };
 
   const getTableTotal = (tableId: string) => {
     const orders = getTableOrders(tableId);
-    console.log(`Calculating total for table ${tableId}`);
-    console.log({
-      orders,
-      total: orders.reduce((total, order) => {
-        console.log({ total, orderTotal: order.totalAmount });
-
-        return total + order.totalAmount;
-      }, 0),
-    });
-
     return orders.reduce((total, order) => total + order.totalAmount, 0);
   };
 
@@ -217,7 +206,7 @@ const ReceptionDashboard: React.FC = () => {
         <h1 className="text-3xl font-bold">Reception Dashboard</h1>
         <AnalyticsDialog />
       </div>
-      
+
       <Tabs defaultValue="dashboard" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -242,7 +231,7 @@ const ReceptionDashboard: React.FC = () => {
                       Today's Revenue
                     </p>
                     <p className="text-3xl font-bold">
-                      ${getTodaysRevenue().toFixed(2)}
+                      ₹{getTodaysRevenue().toFixed(2)}
                     </p>
                   </div>
                   <DollarSign className="h-8 w-8 text-green-200" />
@@ -288,7 +277,7 @@ const ReceptionDashboard: React.FC = () => {
                       Avg Order Value
                     </p>
                     <p className="text-3xl font-bold">
-                      ${getAverageOrderValue().toFixed(2)}
+                      ₹{getAverageOrderValue().toFixed(2)}
                     </p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-purple-200" />
@@ -313,7 +302,7 @@ const ReceptionDashboard: React.FC = () => {
                     const timeOccupied = table.occupiedAt
                       ? Math.floor(
                           (new Date().getTime() - table.occupiedAt.getTime()) /
-                            (1000 * 60),
+                            (1000 * 60)
                         )
                       : 0;
 
@@ -330,7 +319,7 @@ const ReceptionDashboard: React.FC = () => {
                         </div>
                         <div className="text-right">
                           <p className="font-medium">
-                            ${tableTotal.toFixed(2)}
+                            ₹{tableTotal.toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-600">
                             {timeOccupied} min
@@ -469,7 +458,7 @@ const ReceptionDashboard: React.FC = () => {
                                 <TableCell>{bill.tableNumber}</TableCell>
                                 <TableCell>{bill.guestName}</TableCell>
                                 <TableCell className="font-medium">
-                                  ${bill.total.toFixed(2)}
+                                  ₹{bill.total.toFixed(2)}
                                 </TableCell>
                                 <TableCell className="text-sm">
                                   {bill.paidAt ? formatDate(bill.paidAt) : "-"}
@@ -527,7 +516,7 @@ const ReceptionDashboard: React.FC = () => {
                                 <TableCell>{bill.tableNumber}</TableCell>
                                 <TableCell>{bill.guestName}</TableCell>
                                 <TableCell className="font-medium">
-                                  ${bill.total.toFixed(2)}
+                                  ₹{bill.total.toFixed(2)}
                                 </TableCell>
                                 <TableCell className="text-sm">
                                   {formatDate(bill.generatedAt)}

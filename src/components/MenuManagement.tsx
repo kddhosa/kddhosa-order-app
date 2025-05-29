@@ -124,7 +124,7 @@ const MenuManagement: React.FC = () => {
       price: item.price,
       category: item.category,
       preparationTime: item.preparationTime,
-      allergens: item.allergens.join(", "),
+      allergens: item.allergens?.join(", "),
       isAvailable: item.isAvailable,
     });
     setIsDialogOpen(true);
@@ -216,7 +216,7 @@ const MenuManagement: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="price">Price ($)</Label>
+                    <Label htmlFor="price">Price (₹)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -336,7 +336,7 @@ const MenuManagement: React.FC = () => {
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
-                <TableCell>${item.price.toFixed(2)}</TableCell>
+                <TableCell>₹{item.price?.toFixed(2)}</TableCell>
                 <TableCell>{item.preparationTime} min</TableCell>
                 <TableCell>
                   <Badge variant={item.isAvailable ? "default" : "secondary"}>
