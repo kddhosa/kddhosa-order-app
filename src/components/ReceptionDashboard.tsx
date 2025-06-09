@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -165,9 +166,9 @@ const ReceptionDashboard: React.FC = () => {
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
 
-    if (minutes < 1) return "Just now";
-    if (minutes === 1) return "1 min ago";
-    return `${minutes} min ago`;
+    if (minutes < 1) return "હમણાં જ";
+    if (minutes === 1) return "1 મિનિટ પહેલાં";
+    return `${minutes} મિનિટ પહેલાં`;
   };
 
   const getPaidBills = () => {
@@ -179,7 +180,7 @@ const ReceptionDashboard: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("gu-IN", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -190,7 +191,7 @@ const ReceptionDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout title="Reception Dashboard">
+      <Layout title="રિસેપ્શન ડેશબોર્ડ">
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -207,26 +208,26 @@ const ReceptionDashboard: React.FC = () => {
   }
 
   return (
-    <Layout title="Reception Dashboard">
+    <Layout title="રિસેપ્શન ડેશબોર્ડ">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Reception Dashboard</h1>
+        <h1 className="text-3xl font-bold">રિસેપ્શન ડેશબોર્ડ</h1>
         <AnalyticsDialog />
       </div>
 
       <Tabs defaultValue="dashboard" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="dashboard">ડેશબોર્ડ</TabsTrigger>
           <TabsTrigger value="menu-management">
             <UtensilsCrossed className="h-4 w-4 mr-2" />
-            Menu Management
+            મેન્યુ મેનેજમેન્ટ
           </TabsTrigger>
           <TabsTrigger value="category-management">
             <Settings className="h-4 w-4 mr-2" />
-            Category Management
+            કેટેગરી મેનેજમેન્ટ
           </TabsTrigger>
           <TabsTrigger value="table-management">
             <Settings className="h-4 w-4 mr-2" />
-            Table Management
+            ટેબલ મેનેજમેન્ટ
           </TabsTrigger>
         </TabsList>
 
@@ -238,7 +239,7 @@ const ReceptionDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100 text-sm font-medium">
-                      Today's Revenue
+                      આજની આવક
                     </p>
                     <p className="text-3xl font-bold">
                       ₹{getTodaysRevenue().toFixed(2)}
@@ -254,7 +255,7 @@ const ReceptionDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100 text-sm font-medium">
-                      Orders Today
+                      આજના ઓર્ડર
                     </p>
                     <p className="text-3xl font-bold">{orders.length}</p>
                   </div>
@@ -268,7 +269,7 @@ const ReceptionDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-orange-100 text-sm font-medium">
-                      Active Tables
+                      સક્રિય ટેબલ
                     </p>
                     <p className="text-3xl font-bold">
                       {getActiveTables().length}
@@ -284,7 +285,7 @@ const ReceptionDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-100 text-sm font-medium">
-                      Avg Order Value
+                      સરેરાશ ઓર્ડર વેલ્યુ
                     </p>
                     <p className="text-3xl font-bold">
                       ₹{getAverageOrderValue().toFixed(2)}
@@ -302,7 +303,7 @@ const ReceptionDashboard: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="h-5 w-5 mr-2" />
-                  Active Tables
+                  સક્રિય ટેબલ
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -322,7 +323,7 @@ const ReceptionDashboard: React.FC = () => {
                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                       >
                         <div>
-                          <p className="font-medium">Table {table.number}</p>
+                          <p className="font-medium">ટેબલ {table.number}</p>
                           <p className="text-sm text-gray-600">
                             {table.guestName}
                           </p>
@@ -332,7 +333,7 @@ const ReceptionDashboard: React.FC = () => {
                             ₹{tableTotal.toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {timeOccupied} min
+                            {timeOccupied} મિનિટ
                           </p>
                         </div>
                         <div className="relative">
@@ -347,10 +348,10 @@ const ReceptionDashboard: React.FC = () => {
                             {generatingBill === table.id ? (
                               <div className="flex items-center">
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                Generating...
+                                તૈયાર કરી રહ્યું છે...
                               </div>
                             ) : (
-                              "Generate Bill"
+                              "બિલ બનાવો"
                             )}
                           </Button>
                         </div>
@@ -359,7 +360,7 @@ const ReceptionDashboard: React.FC = () => {
                   })}
                   {getActiveTables().length === 0 && (
                     <p className="text-gray-500 text-center py-8">
-                      No active tables
+                      કોઈ સક્રિય ટેબલ નથી
                     </p>
                   )}
                 </div>
@@ -370,7 +371,7 @@ const ReceptionDashboard: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Clock className="h-5 w-5 mr-2" />
-                  Recent Orders
+                  તાજેતરના ઓર્ડર
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -383,7 +384,7 @@ const ReceptionDashboard: React.FC = () => {
                       <div>
                         <p className="font-medium">#{order.id.slice(-6)}</p>
                         <p className="text-sm text-gray-600">
-                          Table {order.tableNumber}
+                          ટેબલ {order.tableNumber}
                         </p>
                       </div>
                       <div className="text-right">
@@ -401,7 +402,9 @@ const ReceptionDashboard: React.FC = () => {
                                   : "bg-orange-500"
                           }
                         >
-                          {order.status}
+                          {order.status === "preparing" ? "તૈયાર કરી રહ્યું છે" :
+                           order.status === "ready" ? "તૈયાર" :
+                           order.status === "served" ? "સર્વ કર્યું" : order.status}
                         </Badge>
                         <p className="text-sm text-gray-600 mt-1">
                           {getTimeAgo(order.createdAt)}
@@ -411,7 +414,7 @@ const ReceptionDashboard: React.FC = () => {
                   ))}
                   {getRecentOrders().length === 0 && (
                     <p className="text-gray-500 text-center py-8">
-                      No recent orders
+                      કોઈ તાજેતરના ઓર્ડર નથી
                     </p>
                   )}
                 </div>
@@ -424,7 +427,7 @@ const ReceptionDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <History className="h-5 w-5 mr-2" />
-                Bill History
+                બિલ ઇતિહાસ
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -432,7 +435,7 @@ const ReceptionDashboard: React.FC = () => {
                 <AccordionItem value="paid-bills">
                   <AccordionTrigger>
                     <div className="flex items-center justify-between w-full mr-4">
-                      <span>Paid Bills ({getPaidBills().length})</span>
+                      <span>ચુકવાયેલા બિલ ({getPaidBills().length})</span>
                       <span className="text-green-600 font-semibold">
                         ₹
                         {getPaidBills()
@@ -445,18 +448,18 @@ const ReceptionDashboard: React.FC = () => {
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {getPaidBills().length === 0 ? (
                         <p className="text-gray-500 text-center py-4">
-                          No paid bills found
+                          કોઈ ચુકવાયેલા બિલ મળ્યા નથી
                         </p>
                       ) : (
                         <TableComponent>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Bill ID</TableHead>
-                              <TableHead>Table</TableHead>
-                              <TableHead>Guest</TableHead>
-                              <TableHead>Amount</TableHead>
-                              <TableHead>Paid At</TableHead>
-                              <TableHead>Payment</TableHead>
+                              <TableHead>બિલ ID</TableHead>
+                              <TableHead>ટેબલ</TableHead>
+                              <TableHead>મહેમાન</TableHead>
+                              <TableHead>રકમ</TableHead>
+                              <TableHead>ચુકવણી વખત</TableHead>
+                              <TableHead>ચુકવણી પદ્ધતિ</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -475,7 +478,9 @@ const ReceptionDashboard: React.FC = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Badge variant="outline" className="text-xs">
-                                    {bill.paymentMethod || "cash"}
+                                    {bill.paymentMethod === "cash" ? "રોકડ" : 
+                                     bill.paymentMethod === "card" ? "કાર્ડ" : 
+                                     bill.paymentMethod || "રોકડ"}
                                   </Badge>
                                 </TableCell>
                               </TableRow>
@@ -490,7 +495,7 @@ const ReceptionDashboard: React.FC = () => {
                 <AccordionItem value="pending-bills">
                   <AccordionTrigger>
                     <div className="flex items-center justify-between w-full mr-4">
-                      <span>Pending Bills ({getPendingBills().length})</span>
+                      <span>બાકી બિલ ({getPendingBills().length})</span>
                       <span className="text-orange-600 font-semibold">
                         ₹
                         {getPendingBills()
@@ -503,18 +508,18 @@ const ReceptionDashboard: React.FC = () => {
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {getPendingBills().length === 0 ? (
                         <p className="text-gray-500 text-center py-4">
-                          No pending bills
+                          કોઈ બાકી બિલ નથી
                         </p>
                       ) : (
                         <TableComponent>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Bill ID</TableHead>
-                              <TableHead>Table</TableHead>
-                              <TableHead>Guest</TableHead>
-                              <TableHead>Amount</TableHead>
-                              <TableHead>Generated At</TableHead>
-                              <TableHead>Status</TableHead>
+                              <TableHead>બિલ ID</TableHead>
+                              <TableHead>ટેબલ</TableHead>
+                              <TableHead>મહેમાન</TableHead>
+                              <TableHead>રકમ</TableHead>
+                              <TableHead>બનાવવાનો સમય</TableHead>
+                              <TableHead>સ્થિતિ</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -536,7 +541,7 @@ const ReceptionDashboard: React.FC = () => {
                                     variant="destructive"
                                     className="text-xs"
                                   >
-                                    Pending
+                                    બાકી
                                   </Badge>
                                 </TableCell>
                               </TableRow>

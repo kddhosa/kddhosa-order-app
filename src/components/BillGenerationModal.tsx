@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react";
 import {
   Dialog,
@@ -67,7 +68,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
     setProcessing(true);
     try {
       if (!table.sessionId) {
-        throw new Error("Invalid table session");
+        throw new Error("અમાન્ય ટેબલ સેશન");
       }
       // Create bill
       const billData: Omit<Bill, "id"> = {
@@ -108,16 +109,16 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
       }
 
       toast({
-        title: "Payment Processed",
-        description: `Bill generated and table ${table.number} released`,
+        title: "ચુકવણી પ્રક્રિયા થઈ",
+        description: `બિલ તૈયાર થયું અને ટેબલ ${table.number} મુક્ત થયું`,
       });
 
       onClose();
     } catch (error) {
       console.error("Error processing payment:", error);
       toast({
-        title: "Error",
-        description: "Failed to process payment. Please try again.",
+        title: "ભૂલ",
+        description: "ચુકવણી પ્રક્રિયા કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
         variant: "destructive",
       });
     }
@@ -130,36 +131,40 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Receipt className="h-5 w-5 mr-2" />
-            Bill for Table {table.number}
+            ટેબલ {table.number} નું બિલ
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Customer Info */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Customer Information</h3>
+            <h3 className="font-semibold mb-2">ગ્રાહકની માહિતી</h3>
             <p>
-              <strong>Name:</strong> {table.guestName}
+              <strong>નામ:</strong> {table.guestName}
             </p>
             <p>
-              <strong>Phone:</strong> {table.guestPhone}
+              <strong>ફોન:</strong> {table.guestPhone}
             </p>
             <p>
-              <strong>Table:</strong> {table.number}
+              <strong>ટેબલ:</strong> {table.number}
             </p>
           </div>
 
           {/* Orders */}
           <div>
-            <h3 className="font-semibold mb-4">Order Details</h3>
+            <h3 className="font-semibold mb-4">ઓર્ડરની વિગતો</h3>
             <div className="space-y-4">
               {currentSessionOrders.map((order, orderIndex) => (
                 <div key={order.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-medium">
-                      Order #{order.id.slice(-6)}
+                      ઓર્ડર #{order.id.slice(-6)}
                     </span>
-                    <Badge variant="outline">{order.status}</Badge>
+                    <Badge variant="outline">
+                      {order.status === "preparing" ? "તૈયાર કરી રહ્યું છે" :
+                       order.status === "ready" ? "તૈયાર" :
+                       order.status === "served" ? "સર્વ કર્યું" : order.status}
+                    </Badge>
                   </div>
                   <div className="space-y-2">
                     {order.items.map((item, itemIndex) => (
@@ -176,7 +181,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                   </div>
                   {order.notes && (
                     <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
-                      <strong>Notes:</strong> {order.notes}
+                      <strong>નોંધ:</strong> {order.notes}
                     </div>
                   )}
                 </div>
@@ -186,19 +191,19 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
 
           {/* Bill Summary */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-4">Bill Summary</h3>
+            <h3 className="font-semibold mb-4">બિલનો સારાંશ</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
+                <span>પેટા કુલ:</span>
                 <span>₹{getSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Tax ({gst}%):</span>
+                <span>કર ({gst}%):</span>
                 <span>₹{getTax().toFixed(2)}</span>
               </div>
               <Separator />
               <div className="flex justify-between text-lg font-bold">
-                <span>Total:</span>
+                <span>કુલ:</span>
                 <span>₹{getTotal().toFixed(2)}</span>
               </div>
             </div>
@@ -206,7 +211,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
 
           {/* Payment Method */}
           <div>
-            <h3 className="font-semibold mb-3">Payment Method</h3>
+            <h3 className="font-semibold mb-3">ચુકવણી પદ્ધતિ</h3>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant={paymentMethod === "cash" ? "default" : "outline"}
@@ -214,7 +219,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                 className="flex items-center justify-center"
               >
                 <DollarSign className="h-4 w-4 mr-2" />
-                Cash
+                રોકડ
               </Button>
               <Button
                 variant={paymentMethod === "card" ? "default" : "outline"}
@@ -222,7 +227,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                 className="flex items-center justify-center"
               >
                 <CreditCard className="h-4 w-4 mr-2" />
-                Card
+                કાર્ડ
               </Button>
             </div>
           </div>
@@ -235,14 +240,14 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
               className="flex-1"
               disabled={processing}
             >
-              Cancel
+              રદ કરો
             </Button>
             <Button
               onClick={handlePayment}
               disabled={processing}
               className="flex-1 bg-green-500 hover:bg-green-600"
             >
-              {processing ? "Processing..." : "Process Payment"}
+              {processing ? "પ્રક્રિયા કરી રહ્યું છે..." : "ચુકવણી કરો"}
             </Button>
           </div>
         </div>
