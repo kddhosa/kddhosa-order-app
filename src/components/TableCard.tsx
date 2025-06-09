@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +41,7 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
       case "available":
         return "ઉપલબ્ધ";
       case "occupied":
-        return "કબજામાં";
+        return "ચાલુ છે";
       case "reserved":
         return "આરક્ષિત";
       default:

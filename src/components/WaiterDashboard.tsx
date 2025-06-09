@@ -245,7 +245,7 @@ const WaiterDashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center text-green-800">
                 <CheckCircle className="h-5 w-5 mr-2" />
-                Ready for Pickup ({readyOrders.length})
+                પિકઅપ માટે તૈયાર ({readyOrders.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -257,12 +257,12 @@ const WaiterDashboard: React.FC = () => {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-medium">Table {order.tableNumber}</p>
+                        <p className="font-medium">ટેબલ {order.tableNumber}</p>
                         <p className="text-sm text-gray-600">
                           {order.guestName}
                         </p>
                       </div>
-                      <Badge className="bg-green-500">Ready</Badge>
+                      <Badge className="bg-green-500">તૈયાર છે</Badge>
                     </div>
                     <div className="space-y-1 mb-3">
                       {order.items.slice(0, 2).map((item, idx) => (
@@ -281,7 +281,7 @@ const WaiterDashboard: React.FC = () => {
                       className="w-full bg-green-600 hover:bg-green-700"
                       onClick={() => handleOrderServed(order.id)}
                     >
-                      Mark as Served
+                      ઓર્ડર પીરસાઈ ચુક્યો છે
                     </Button>
                   </div>
                 ))}
@@ -304,15 +304,15 @@ const WaiterDashboard: React.FC = () => {
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              <span>Available</span>
+              <span>ઉપલબ્ધ</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <span>Occupied</span>
+              <span>ચાલુ છે</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <span>Reserved</span>
+              <span>રિઝર્વ છે </span>
             </div>
           </div>
         </div>

@@ -117,18 +117,6 @@ const TableManagement: React.FC = () => {
       };
 
       if (editingTable) {
-        if (
-          editingTable.status === "occupied" &&
-          formData.status !== "occupied"
-        ) {
-          toast({
-            title: "ભૂલ",
-            description: "કબજે કરેલા ટેબલની સ્થિતિ બદલી શકાતી નથી",
-            variant: "destructive",
-          });
-          setSubmitting(false);
-          return;
-        }
         await updateDoc(doc(db, "tables", editingTable.id), tableData);
         toast({
           title: "સફળતા",
@@ -260,7 +248,7 @@ const TableManagement: React.FC = () => {
                     required
                   />
                 </div>
-                <div>
+                {/* <div>
                   <Label htmlFor="capacity">ક્ષમતા (બેઠકો)</Label>
                   <Input
                     id="capacity"
@@ -293,7 +281,7 @@ const TableManagement: React.FC = () => {
                       <SelectItem value="reserved">આરક્ષિત</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
                 <div className="flex gap-3 pt-4">
                   <Button
                     type="button"
@@ -339,8 +327,11 @@ const TableManagement: React.FC = () => {
                 <TableCell>{table.capacity} બેઠકો</TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(table.status)}>
-                    {table.status === "available" ? "ઉપલબ્ધ" : 
-                     table.status === "occupied" ? "કબજે" : "આરક્ષિત"}
+                    {table.status === "available"
+                      ? "ઉપલબ્ધ"
+                      : table.status === "occupied"
+                        ? "કબજે"
+                        : "આરક્ષિત"}
                   </Badge>
                 </TableCell>
                 <TableCell>{table.guestName || "-"}</TableCell>
@@ -359,7 +350,8 @@ const TableManagement: React.FC = () => {
                           size="sm"
                           variant="destructive"
                           disabled={
-                            deletingId === table.id || table.status === "occupied"
+                            deletingId === table.id ||
+                            table.status === "occupied"
                           }
                         >
                           {deletingId === table.id ? (
@@ -373,8 +365,8 @@ const TableManagement: React.FC = () => {
                         <AlertDialogHeader>
                           <AlertDialogTitle>ટેબલ ડિલીટ કરો</AlertDialogTitle>
                           <AlertDialogDescription>
-                            શું તમે ખરેખર ટેબલ {table.number} ડિલીટ કરવા માંગો છો? 
-                            આ ક્રિયા પૂર્વવત્ કરી શકાશે નહીં.
+                            શું તમે ખરેખર ટેબલ {table.number} ડિલીટ કરવા માંગો
+                            છો? આ ક્રિયા પૂર્વવત્ કરી શકાશે નહીં.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
