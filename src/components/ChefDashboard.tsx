@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -48,8 +49,8 @@ const ChefDashboard: React.FC = () => {
       (error) => {
         console.error("Error fetching orders:", error);
         toast({
-          title: "Error",
-          description: "Failed to load orders. Please refresh the page.",
+          title: "ભૂલ",
+          description: "ઓર્ડર લોડ કરવામાં નિષ્ફળ. કૃપા કરીને પેજ રિફ્રેશ કરો.",
           variant: "destructive",
         });
         setLoading(false);
@@ -70,14 +71,14 @@ const ChefDashboard: React.FC = () => {
       });
 
       toast({
-        title: "Order Updated",
-        description: `Order status changed to ${newStatus}`,
+        title: "ઓર્ડર અપડેટ થયું",
+        description: `ઓર્ડરની સ્થિતિ ${newStatus === "preparing" ? "તૈયાર કરી રહ્યું છે" : "તૈયાર"} માં બદલાઈ`,
       });
     } catch (error) {
       console.error("Error updating order:", error);
       toast({
-        title: "Error",
-        description: "Failed to update order status",
+        title: "ભૂલ",
+        description: "ઓર્ડરની સ્થિતિ અપડેટ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     }
@@ -88,9 +89,9 @@ const ChefDashboard: React.FC = () => {
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
 
-    if (minutes < 1) return "Just now";
-    if (minutes === 1) return "1 min ago";
-    return `${minutes} min ago`;
+    if (minutes < 1) return "હમણાં જ";
+    if (minutes === 1) return "1 મિનિટ પહેલાં";
+    return `${minutes} મિનિટ પહેલાં`;
   };
 
   const getOrdersByStatus = (status: string) => {
@@ -99,7 +100,7 @@ const ChefDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout title="Kitchen Display System">
+      <Layout title="રસોડાની ડિસ્પ્લે સિસ્ટમ">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
         </div>
@@ -108,13 +109,13 @@ const ChefDashboard: React.FC = () => {
   }
 
   return (
-    <Layout title="Kitchen Display System">
+    <Layout title="રસોડાની ડિસ્પ્લે સિસ્ટમ">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* New Orders */}
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <Clock className="h-5 w-5 mr-2 text-orange-500" />
-            New Orders ({getOrdersByStatus("pending").length})
+            નવા ઓર્ડર ({getOrdersByStatus("pending").length})
           </h3>
           <div className="space-y-4">
             {getOrdersByStatus("pending").map((order) => (
@@ -122,7 +123,7 @@ const ChefDashboard: React.FC = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      Table {order.tableNumber}
+                      ટેબલ {order.tableNumber}
                     </CardTitle>
                     <Badge variant="secondary">
                       {getTimeAgo(order.createdAt)}
@@ -150,13 +151,13 @@ const ChefDashboard: React.FC = () => {
                     onClick={() => updateOrderStatus(order.id, "preparing")}
                   >
                     <ChefHat className="h-4 w-4 mr-2" />
-                    Start Preparing
+                    તૈયાર કરવા શરૂ કરો
                   </Button>
                 </CardContent>
               </Card>
             ))}
             {getOrdersByStatus("pending").length === 0 && (
-              <p className="text-gray-500 text-center py-8">No new orders</p>
+              <p className="text-gray-500 text-center py-8">કોઈ નવા ઓર્ડર નથી</p>
             )}
           </div>
         </div>
@@ -165,7 +166,7 @@ const ChefDashboard: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <ChefHat className="h-5 w-5 mr-2 text-blue-500" />
-            Preparing ({getOrdersByStatus("preparing").length})
+            તૈયાર કરી રહ્યું છે ({getOrdersByStatus("preparing").length})
           </h3>
           <div className="space-y-4">
             {getOrdersByStatus("preparing").map((order) => (
@@ -173,7 +174,7 @@ const ChefDashboard: React.FC = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      Table {order.tableNumber}
+                      ટેબલ {order.tableNumber}
                     </CardTitle>
                     <Badge
                       variant="outline"
@@ -204,14 +205,14 @@ const ChefDashboard: React.FC = () => {
                     onClick={() => updateOrderStatus(order.id, "ready")}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Mark Ready
+                    તૈયાર તરીકે માર્ક કરો
                   </Button>
                 </CardContent>
               </Card>
             ))}
             {getOrdersByStatus("preparing").length === 0 && (
               <p className="text-gray-500 text-center py-8">
-                No orders in preparation
+                કોઈ ઓર્ડર તૈયાર થઈ રહ્યા નથી
               </p>
             )}
           </div>
@@ -221,7 +222,7 @@ const ChefDashboard: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
-            Ready for Pickup ({getOrdersByStatus("ready").length})
+            પિકઅપ માટે તૈયાર ({getOrdersByStatus("ready").length})
           </h3>
           <div className="space-y-4">
             {getOrdersByStatus("ready").map((order) => (
@@ -229,13 +230,13 @@ const ChefDashboard: React.FC = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      Table {order.tableNumber}
+                      ટેબલ {order.tableNumber}
                     </CardTitle>
                     <Badge
                       variant="outline"
                       className="border-green-300 text-green-700"
                     >
-                      Ready
+                      તૈયાર
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600">{order.guestName}</p>
@@ -252,13 +253,13 @@ const ChefDashboard: React.FC = () => {
                     ))}
                   </div>
                   <p className="text-xs text-green-600 font-medium text-center">
-                    Waiting for pickup...
+                    પિકઅપની રાહ જોઈ રહ્યું છે...
                   </p>
                 </CardContent>
               </Card>
             ))}
             {getOrdersByStatus("ready").length === 0 && (
-              <p className="text-gray-500 text-center py-8">No orders ready</p>
+              <p className="text-gray-500 text-center py-8">કોઈ ઓર્ડર તૈયાર નથી</p>
             )}
           </div>
         </div>
