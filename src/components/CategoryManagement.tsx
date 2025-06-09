@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -28,6 +27,7 @@ const CategoryManagement: React.FC = () => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editCategoryName, setEditCategoryName] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -93,7 +93,6 @@ const CategoryManagement: React.FC = () => {
       return;
     }
 
-    // Check if category already exists
     if (categories.some(cat => cat.category.toLowerCase() === newCategoryName.toLowerCase())) {
       toast({
         title: "ભૂલ",
@@ -123,7 +122,6 @@ const CategoryManagement: React.FC = () => {
       return;
     }
 
-    // Check if category already exists (excluding current one)
     if (categories.some(cat => 
       cat.id !== editingCategory.id && 
       cat.category.toLowerCase() === editCategoryName.toLowerCase()
@@ -148,8 +146,24 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    const updatedCategories = categories.filter(cat => cat.id !== categoryId);
-    await saveCategories(updatedCategories);
+    setDeletingId(categoryId);
+    try {
+      const updatedCategories = categories.filter(cat => cat.id !== categoryId);
+      await saveCategories(updatedCategories);
+      toast({
+        title: "સફળતા",
+        description: "કેટેગરી સફળતાપૂર્વક ડિલીટ થઈ",
+      });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast({
+        title: "ભૂલ",
+        description: "કેટેગરી ડિલીટ કરવામાં નિષ્ફળ",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const startEdit = (category: Category) => {
@@ -248,14 +262,22 @@ const CategoryManagement: React.FC = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => startEdit(category)}
-                          disabled={saving}
+                          disabled={saving || deletingId === category.id}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button size="sm" variant="destructive" disabled={saving}>
-                              <Trash2 className="h-4 w-4" />
+                            <Button 
+                              size="sm" 
+                              variant="destructive" 
+                              disabled={saving || deletingId === category.id}
+                            >
+                              {deletingId === category.id ? (
+                                <Loader className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
@@ -267,13 +289,15 @@ const CategoryManagement: React.FC = () => {
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel disabled={saving}>રદ કરો</AlertDialogCancel>
+                              <AlertDialogCancel disabled={deletingId === category.id}>
+                                રદ કરો
+                              </AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() => handleDeleteCategory(category.id)}
                                 className="bg-red-500 hover:bg-red-600"
-                                disabled={saving}
+                                disabled={deletingId === category.id}
                               >
-                                {saving ? (
+                                {deletingId === category.id ? (
                                   <>
                                     <Loader className="h-4 w-4 mr-2 animate-spin" />
                                     ડિલીટ કરી રહ્યું છે...

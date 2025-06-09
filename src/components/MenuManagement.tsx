@@ -22,6 +22,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -91,14 +102,14 @@ const MenuManagement: React.FC = () => {
       if (editingItem) {
         await updateDoc(doc(db, "menuItems", editingItem.id), itemData);
         toast({
-          title: "Success",
-          description: "Menu item updated successfully",
+          title: "સફળતા",
+          description: "મેનુ આઇટમ સફળતાપૂર્વક અપડેટ થયું",
         });
       } else {
         await addDoc(collection(db, "menuItems"), itemData);
         toast({
-          title: "Success",
-          description: "Menu item created successfully",
+          title: "સફળતા",
+          description: "મેનુ આઇટમ સફળતાપૂર્વક બનાવાયું",
         });
       }
 
@@ -107,8 +118,8 @@ const MenuManagement: React.FC = () => {
     } catch (error) {
       console.error("Error saving menu item:", error);
       toast({
-        title: "Error",
-        description: "Failed to save menu item",
+        title: "ભૂલ",
+        description: "મેનુ આઇટમ સેવ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -135,14 +146,14 @@ const MenuManagement: React.FC = () => {
     try {
       await deleteDoc(doc(db, "menuItems", itemId));
       toast({
-        title: "Success",
-        description: "Menu item deleted successfully",
+        title: "સફળતા",
+        description: "મેનુ આઇટમ સફળતાપૂર્વક ડિલીટ થયું",
       });
     } catch (error) {
       console.error("Error deleting menu item:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete menu item",
+        title: "ભૂલ",
+        description: "મેનુ આઇટમ ડિલીટ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -159,7 +170,7 @@ const MenuManagement: React.FC = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Menu Management</CardTitle>
+          <CardTitle>મેનુ મેનેજમેન્ટ</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -174,7 +185,7 @@ const MenuManagement: React.FC = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Menu Management</CardTitle>
+          <CardTitle>મેનુ મેનેજમેન્ટ</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -182,18 +193,18 @@ const MenuManagement: React.FC = () => {
                 className="bg-green-500 hover:bg-green-600"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Menu Item
+                મેનુ આઇટમ ઉમેરો
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>
-                  {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
+                  {editingItem ? "મેનુ આઇટમ એડિટ કરો" : "નવું મેનુ આઇટમ ઉમેરો"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">નામ</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -204,7 +215,7 @@ const MenuManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">વર્ણન</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -216,7 +227,7 @@ const MenuManagement: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="price">Price (₹)</Label>
+                    <Label htmlFor="price">કિંમત (₹)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -233,7 +244,7 @@ const MenuManagement: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="preparationTime">Prep Time (min)</Label>
+                    <Label htmlFor="preparationTime">તૈયારીનો સમય (મિનિટ)</Label>
                     <Input
                       id="preparationTime"
                       type="number"
@@ -250,7 +261,7 @@ const MenuManagement: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">કેટેગરી</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) =>
@@ -258,7 +269,7 @@ const MenuManagement: React.FC = () => {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder="કેટેગરી પસંદ કરો" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -270,14 +281,14 @@ const MenuManagement: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="allergens">Allergens (comma-separated)</Label>
+                  <Label htmlFor="allergens">એલર્જન (કોમા વડે અલગ કરો)</Label>
                   <Input
                     id="allergens"
                     value={formData.allergens}
                     onChange={(e) =>
                       setFormData({ ...formData, allergens: e.target.value })
                     }
-                    placeholder="e.g., nuts, dairy, gluten"
+                    placeholder="ઉદા., બદામ, દૂધ, ઘઉં"
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -292,7 +303,7 @@ const MenuManagement: React.FC = () => {
                       })
                     }
                   />
-                  <Label htmlFor="isAvailable">Available</Label>
+                  <Label htmlFor="isAvailable">ઉપલબ્ધ</Label>
                 </div>
                 <div className="flex gap-3 pt-4">
                   <Button
@@ -301,7 +312,7 @@ const MenuManagement: React.FC = () => {
                     onClick={() => setIsDialogOpen(false)}
                     className="flex-1"
                   >
-                    Cancel
+                    રદ કરો
                   </Button>
                   <Button
                     type="submit"
@@ -311,7 +322,7 @@ const MenuManagement: React.FC = () => {
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
-                    {editingItem ? "Update" : "Create"}
+                    {editingItem ? "અપડેટ કરો" : "બનાવો"}
                   </Button>
                 </div>
               </form>
@@ -323,12 +334,12 @@ const MenuManagement: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Prep Time</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>નામ</TableHead>
+              <TableHead>કેટેગરી</TableHead>
+              <TableHead>કિંમત</TableHead>
+              <TableHead>તૈયારીનો સમય</TableHead>
+              <TableHead>સ્થિતિ</TableHead>
+              <TableHead>ક્રિયાઓ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -337,10 +348,10 @@ const MenuManagement: React.FC = () => {
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
                 <TableCell>₹{item.price?.toFixed(2)}</TableCell>
-                <TableCell>{item.preparationTime} min</TableCell>
+                <TableCell>{item.preparationTime} મિનિટ</TableCell>
                 <TableCell>
                   <Badge variant={item.isAvailable ? "default" : "secondary"}>
-                    {item.isAvailable ? "Available" : "Unavailable"}
+                    {item.isAvailable ? "ઉપલબ્ધ" : "અનુપલબ્ધ"}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -352,18 +363,49 @@ const MenuManagement: React.FC = () => {
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deletingId === item.id}
-                    >
-                      {deletingId === item.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash className="h-4 w-4" />
-                      )}
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={deletingId === item.id}
+                        >
+                          {deletingId === item.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>મેનુ આઇટમ ડિલીટ કરો</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            શું તમે ખરેખર મેનુ આઇટમ "{item.name}" ડિલીટ કરવા માંગો છો? 
+                            આ ક્રિયા પૂર્વવત્ કરી શકાશે નહીં.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={deletingId === item.id}>
+                            રદ કરો
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(item.id)}
+                            className="bg-red-500 hover:bg-red-600"
+                            disabled={deletingId === item.id}
+                          >
+                            {deletingId === item.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                ડિલીટ કરી રહ્યું છે...
+                              </>
+                            ) : (
+                              "ડિલીટ કરો"
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </TableCell>
               </TableRow>
@@ -372,7 +414,7 @@ const MenuManagement: React.FC = () => {
         </Table>
         {menuItems.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No menu items found. Add your first menu item!
+            કોઈ મેનુ આઇટમ મળ્યું નથી. તમારું પ્રથમ મેનુ આઇટમ ઉમેરો!
           </div>
         )}
       </CardContent>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -22,6 +21,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -85,15 +95,14 @@ const TableManagement: React.FC = () => {
     setSubmitting(true);
 
     try {
-      // Check if table number already exists (when creating new table)
       if (!editingTable) {
         const existingTable = tables.find(
           (table) => table.number === formData.number
         );
         if (existingTable) {
           toast({
-            title: "Error",
-            description: "A table with this number already exists",
+            title: "ભૂલ",
+            description: "આ નંબર સાથે ટેબલ પહેલેથી અસ્તિત્વમાં છે",
             variant: "destructive",
           });
           setSubmitting(false);
@@ -113,8 +122,8 @@ const TableManagement: React.FC = () => {
           formData.status !== "occupied"
         ) {
           toast({
-            title: "Error",
-            description: "Cannot change status of an occupied table",
+            title: "ભૂલ",
+            description: "કબજે કરેલા ટેબલની સ્થિતિ બદલી શકાતી નથી",
             variant: "destructive",
           });
           setSubmitting(false);
@@ -122,14 +131,14 @@ const TableManagement: React.FC = () => {
         }
         await updateDoc(doc(db, "tables", editingTable.id), tableData);
         toast({
-          title: "Success",
-          description: "Table updated successfully",
+          title: "સફળતા",
+          description: "ટેબલ સફળતાપૂર્વક અપડેટ થયું",
         });
       } else {
         await addDoc(collection(db, "tables"), tableData);
         toast({
-          title: "Success",
-          description: "Table created successfully",
+          title: "સફળતા",
+          description: "ટેબલ સફળતાપૂર્વક બનાવાયું",
         });
       }
 
@@ -138,8 +147,8 @@ const TableManagement: React.FC = () => {
     } catch (error) {
       console.error("Error saving table:", error);
       toast({
-        title: "Error",
-        description: "Failed to save table",
+        title: "ભૂલ",
+        description: "ટેબલ સેવ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -162,14 +171,14 @@ const TableManagement: React.FC = () => {
     try {
       await deleteDoc(doc(db, "tables", tableId));
       toast({
-        title: "Success",
-        description: "Table deleted successfully",
+        title: "સફળતા",
+        description: "ટેબલ સફળતાપૂર્વક ડિલીટ થયું",
       });
     } catch (error) {
       console.error("Error deleting table:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete table",
+        title: "ભૂલ",
+        description: "ટેબલ ડિલીટ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -179,7 +188,6 @@ const TableManagement: React.FC = () => {
 
   const openAddDialog = () => {
     resetForm();
-    // Set next available table number
     const maxNumber =
       tables.length > 0 ? Math.max(...tables.map((t) => t.number)) : 0;
     setFormData((prev) => ({ ...prev, number: maxNumber + 1 }));
@@ -203,7 +211,7 @@ const TableManagement: React.FC = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Table Management</CardTitle>
+          <CardTitle>ટેબલ મેનેજમેન્ટ</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -218,7 +226,7 @@ const TableManagement: React.FC = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Table Management</CardTitle>
+          <CardTitle>ટેબલ મેનેજમેન્ટ</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -226,18 +234,18 @@ const TableManagement: React.FC = () => {
                 className="bg-blue-500 hover:bg-blue-600"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Table
+                ટેબલ ઉમેરો
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>
-                  {editingTable ? "Edit Table" : "Add New Table"}
+                  {editingTable ? "ટેબલ એડિટ કરો" : "નવું ટેબલ ઉમેરો"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="number">Table Number</Label>
+                  <Label htmlFor="number">ટેબલ નંબર</Label>
                   <Input
                     id="number"
                     type="number"
@@ -253,7 +261,7 @@ const TableManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="capacity">Capacity (seats)</Label>
+                  <Label htmlFor="capacity">ક્ષમતા (બેઠકો)</Label>
                   <Input
                     id="capacity"
                     type="number"
@@ -270,19 +278,19 @@ const TableManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">સ્થિતિ</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value: TableStatus) => 
                       setFormData({ ...formData, status: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="સ્થિતિ પસંદ કરો" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="available">Available</SelectItem>
-                      <SelectItem value="occupied">Occupied</SelectItem>
-                      <SelectItem value="reserved">Reserved</SelectItem>
+                      <SelectItem value="available">ઉપલબ્ધ</SelectItem>
+                      <SelectItem value="occupied">કબજે</SelectItem>
+                      <SelectItem value="reserved">આરક્ષિત</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -293,7 +301,7 @@ const TableManagement: React.FC = () => {
                     onClick={() => setIsDialogOpen(false)}
                     className="flex-1"
                   >
-                    Cancel
+                    રદ કરો
                   </Button>
                   <Button
                     type="submit"
@@ -303,7 +311,7 @@ const TableManagement: React.FC = () => {
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
-                    {editingTable ? "Update" : "Create"}
+                    {editingTable ? "અપડેટ કરો" : "બનાવો"}
                   </Button>
                 </div>
               </form>
@@ -315,23 +323,24 @@ const TableManagement: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Table Number</TableHead>
-              <TableHead>Capacity</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Guest</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>ટેબલ નંબર</TableHead>
+              <TableHead>ક્ષમતા</TableHead>
+              <TableHead>સ્થિતિ</TableHead>
+              <TableHead>મહેમાન</TableHead>
+              <TableHead>ક્રિયાઓ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tables.map((table) => (
               <TableRow key={table.id}>
                 <TableCell className="font-medium">
-                  Table {table.number}
+                  ટેબલ {table.number}
                 </TableCell>
-                <TableCell>{table.capacity} seats</TableCell>
+                <TableCell>{table.capacity} બેઠકો</TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(table.status)}>
-                    {table.status}
+                    {table.status === "available" ? "ઉપલબ્ધ" : 
+                     table.status === "occupied" ? "કબજે" : "આરક્ષિત"}
                   </Badge>
                 </TableCell>
                 <TableCell>{table.guestName || "-"}</TableCell>
@@ -344,20 +353,51 @@ const TableManagement: React.FC = () => {
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(table.id)}
-                      disabled={
-                        deletingId === table.id || table.status === "occupied"
-                      }
-                    >
-                      {deletingId === table.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash className="h-4 w-4" />
-                      )}
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={
+                            deletingId === table.id || table.status === "occupied"
+                          }
+                        >
+                          {deletingId === table.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>ટેબલ ડિલીટ કરો</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            શું તમે ખરેખર ટેબલ {table.number} ડિલીટ કરવા માંગો છો? 
+                            આ ક્રિયા પૂર્વવત્ કરી શકાશે નહીં.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={deletingId === table.id}>
+                            રદ કરો
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(table.id)}
+                            className="bg-red-500 hover:bg-red-600"
+                            disabled={deletingId === table.id}
+                          >
+                            {deletingId === table.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                ડિલીટ કરી રહ્યું છે...
+                              </>
+                            ) : (
+                              "ડિલીટ કરો"
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </TableCell>
               </TableRow>
@@ -366,7 +406,7 @@ const TableManagement: React.FC = () => {
         </Table>
         {tables.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No tables found. Add your first table!
+            કોઈ ટેબલ મળ્યું નથી. તમારું પ્રથમ ટેબલ ઉમેરો!
           </div>
         )}
       </CardContent>
