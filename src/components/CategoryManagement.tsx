@@ -18,12 +18,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CategoryManagement: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editCategoryName, setEditCategoryName] = useState("");
@@ -61,6 +62,7 @@ const CategoryManagement: React.FC = () => {
 
   const saveCategories = async (updatedCategories: Category[]) => {
     try {
+      setSaving(true);
       await updateDoc(doc(db, "menuItems", "categories"), {
         items: updatedCategories,
       });
@@ -76,6 +78,8 @@ const CategoryManagement: React.FC = () => {
         description: "Failed to save categories",
         variant: "destructive",
       });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -188,11 +192,16 @@ const CategoryManagement: React.FC = () => {
               placeholder="Enter category name"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
+              onKeyPress={(e) => e.key === "Enter" && !saving && handleAddCategory()}
+              disabled={saving}
             />
-            <Button onClick={handleAddCategory} className="shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              Add
+            <Button onClick={handleAddCategory} className="shrink-0" disabled={saving}>
+              {saving ? (
+                <Loader className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
+              {saving ? "Adding..." : "Add"}
             </Button>
           </div>
         </div>
@@ -214,13 +223,18 @@ const CategoryManagement: React.FC = () => {
                       <Input
                         value={editCategoryName}
                         onChange={(e) => setEditCategoryName(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleEditCategory()}
+                        onKeyPress={(e) => e.key === "Enter" && !saving && handleEditCategory()}
                         className="flex-1"
+                        disabled={saving}
                       />
-                      <Button size="sm" onClick={handleEditCategory}>
-                        Save
+                      <Button size="sm" onClick={handleEditCategory} disabled={saving}>
+                        {saving ? (
+                          <Loader className="h-4 w-4 animate-spin" />
+                        ) : (
+                          "Save"
+                        )}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={cancelEdit}>
+                      <Button size="sm" variant="outline" onClick={cancelEdit} disabled={saving}>
                         Cancel
                       </Button>
                     </div>
@@ -234,12 +248,13 @@ const CategoryManagement: React.FC = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => startEdit(category)}
+                          disabled={saving}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button size="sm" variant="destructive">
+                            <Button size="sm" variant="destructive" disabled={saving}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
@@ -252,12 +267,20 @@ const CategoryManagement: React.FC = () => {
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel disabled={saving}>Cancel</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() => handleDeleteCategory(category.id)}
                                 className="bg-red-500 hover:bg-red-600"
+                                disabled={saving}
                               >
-                                Delete
+                                {saving ? (
+                                  <>
+                                    <Loader className="h-4 w-4 mr-2 animate-spin" />
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  "Delete"
+                                )}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
