@@ -47,6 +47,7 @@ import BillGenerationModal from "./BillGenerationModal";
 import MenuManagement from "./MenuManagement";
 import TableManagement from "./TableManagement";
 import AnalyticsDialog from "./AnalyticsDialog";
+import CategoryManagement from "./CategoryManagement";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -213,11 +214,15 @@ const ReceptionDashboard: React.FC = () => {
       </div>
 
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 h-auto">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="menu-management">
             <UtensilsCrossed className="h-4 w-4 mr-2" />
             Menu Management
+          </TabsTrigger>
+          <TabsTrigger value="category-management">
+            <Settings className="h-4 w-4 mr-2" />
+            Category Management
           </TabsTrigger>
           <TabsTrigger value="table-management">
             <Settings className="h-4 w-4 mr-2" />
@@ -549,6 +554,10 @@ const ReceptionDashboard: React.FC = () => {
 
         <TabsContent value="menu-management">
           <MenuManagement />
+        </TabsContent>
+
+        <TabsContent value="category-management">
+          <CategoryManagement />
         </TabsContent>
 
         <TabsContent value="table-management">
