@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,19 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "available":
+        return "ઉપલબ્ધ";
+      case "occupied":
+        return "કબજામાં";
+      case "reserved":
+        return "આરક્ષિત";
+      default:
+        return status;
+    }
+  };
+
   const getTimeOccupied = () => {
     if (!table.occupiedAt) return "";
     const now = new Date();
@@ -44,9 +58,9 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
     const hours = Math.floor(minutes / 60);
 
     if (hours > 0) {
-      return `${hours}h ${minutes % 60}m`;
+      return `${hours}કલાક ${minutes % 60}મિનિટ`;
     }
-    return `${minutes}m`;
+    return `${minutes}મિનિટ`;
   };
 
   return (
@@ -58,12 +72,12 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <h3 className="text-2xl font-bold text-gray-900">
-              Table {table.number}
+              ટેબલ {table.number}
             </h3>
             <Badge
               className={`${getStatusBadgeColor(table.status)} text-white`}
             >
-              {table.status}
+              {getStatusText(table.status)}
             </Badge>
           </div>
           <div className="flex items-center text-gray-600">
@@ -91,12 +105,12 @@ const TableCard: React.FC<TableCardProps> = ({ table, onClick }) => {
         )}
 
         {table.status === "available" && (
-          <p className="text-gray-500 text-sm">Click to assign guests</p>
+          <p className="text-gray-500 text-sm">મહેમાન સોંપવા માટે ક્લિક કરો</p>
         )}
 
         {table.status === "reserved" && table.guestName && (
           <div>
-            <p className="font-medium text-gray-900">Reserved for:</p>
+            <p className="font-medium text-gray-900">આરક્ષિત છે:</p>
             <p className="text-gray-700">{table.guestName}</p>
           </div>
         )}

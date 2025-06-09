@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -11,7 +12,7 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-amber-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Bliss Foods...</p>
+          <p className="text-gray-600">બ્લિસ ફૂડ્સ લોડ કરી રહ્યું છે...</p>
         </div>
       </div>
     );
@@ -20,10 +21,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-amber-50 flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Bliss Foods</h1>
-        <p className="text-xl text-gray-600">Restaurant Management System</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">બ્લિસ ફૂડ્સ</h1>
+        <p className="text-xl text-gray-600">રેસ્ટોરન્ટ મેનેજમેન્ટ સિસ્ટમ</p>
         <p className="text-sm text-gray-500 mt-4">
-          {user ? `Welcome ${user.email}` : "Please authenticate to continue"}
+          {user ? `સ્વાગત છે ${user.email}` : "ચાલુ રાખવા માટે કૃપા કરીને પ્રમાણીકરણ કરો"}
         </p>
       </div>
     </div>

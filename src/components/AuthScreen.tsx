@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +23,9 @@ const AuthScreen: React.FC = () => {
       await signInWithGoogle();
     } catch (error) {
       toast({
-        title: "Authentication Failed",
+        title: "પ્રમાણીકરણ નિષ્ફળ",
         description:
-          "Unable to sign in. Please check if your email is authorized.",
+          "સાઇન ઇન કરવામાં અસમર્થ. કૃપા કરીને તપાસો કે તમારું ઇમેઇલ અધિકૃત છે કે નહીં.",
         variant: "destructive",
       });
     } finally {
@@ -36,17 +37,17 @@ const AuthScreen: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Bliss Foods</h1>
-          <p className="text-lg text-gray-600">Restaurant Management System</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">બ્લિસ ફૂડ્સ</h1>
+          <p className="text-lg text-gray-600">રેસ્ટોરન્ટ મેનેજમેન્ટ સિસ્ટમ</p>
         </div>
 
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-gray-900">
-              Welcome Back
+              પાછા આવવા પર સ્વાગત છે
             </CardTitle>
             <CardDescription>
-              Sign in with your authorized Google account to continue
+              ચાલુ રાખવા માટે તમારા અધિકૃત Google એકાઉન્ટ સાથે સાઇન ઇન કરો
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -61,11 +62,11 @@ const AuthScreen: React.FC = () => {
               ) : (
                 <LogIn className="mr-2 h-5 w-5" />
               )}
-              Sign in with Google
+              Google સાથે સાઇન ઇન કરો
             </Button>
 
             <div className="mt-6 text-center text-sm text-gray-500">
-              <p>Only authorized restaurant staff can access this system</p>
+              <p>ફક્ત અધિકૃત રેસ્ટોરન્ટ સ્ટાફ જ આ સિસ્ટમને એક્સેસ કરી શકે છે</p>
             </div>
           </CardContent>
         </Card>

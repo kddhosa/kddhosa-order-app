@@ -47,8 +47,8 @@ const CategoryManagement: React.FC = () => {
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast({
-        title: "Error",
-        description: "Failed to load categories",
+        title: "ભૂલ",
+        description: "કેટેગરીઓ લોડ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -68,14 +68,14 @@ const CategoryManagement: React.FC = () => {
       });
       setCategories(updatedCategories);
       toast({
-        title: "Success",
-        description: "Categories updated successfully",
+        title: "સફળતા",
+        description: "કેટેગરીઓ સફળતાપૂર્વક અપડેટ થઈ",
       });
     } catch (error) {
       console.error("Error saving categories:", error);
       toast({
-        title: "Error",
-        description: "Failed to save categories",
+        title: "ભૂલ",
+        description: "કેટેગરીઓ સેવ કરવામાં નિષ્ફળ",
         variant: "destructive",
       });
     } finally {
@@ -86,8 +86,8 @@ const CategoryManagement: React.FC = () => {
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) {
       toast({
-        title: "Error",
-        description: "Category name cannot be empty",
+        title: "ભૂલ",
+        description: "કેટેગરીનું નામ ખાલી હોઈ શકે નહીં",
         variant: "destructive",
       });
       return;
@@ -96,8 +96,8 @@ const CategoryManagement: React.FC = () => {
     // Check if category already exists
     if (categories.some(cat => cat.category.toLowerCase() === newCategoryName.toLowerCase())) {
       toast({
-        title: "Error",
-        description: "Category already exists",
+        title: "ભૂલ",
+        description: "કેટેગરી પહેલેથી અસ્તિત્વમાં છે",
         variant: "destructive",
       });
       return;
@@ -116,8 +116,8 @@ const CategoryManagement: React.FC = () => {
   const handleEditCategory = async () => {
     if (!editCategoryName.trim() || !editingCategory) {
       toast({
-        title: "Error",
-        description: "Category name cannot be empty",
+        title: "ભૂલ",
+        description: "કેટેગરીનું નામ ખાલી હોઈ શકે નહીં",
         variant: "destructive",
       });
       return;
@@ -129,8 +129,8 @@ const CategoryManagement: React.FC = () => {
       cat.category.toLowerCase() === editCategoryName.toLowerCase()
     )) {
       toast({
-        title: "Error",
-        description: "Category already exists",
+        title: "ભૂલ",
+        description: "કેટેગરી પહેલેથી અસ્તિત્વમાં છે",
         variant: "destructive",
       });
       return;
@@ -166,7 +166,7 @@ const CategoryManagement: React.FC = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Category Management</CardTitle>
+          <CardTitle>કેટેગરી મેનેજમેન્ટ</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
@@ -180,16 +180,16 @@ const CategoryManagement: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Category Management</CardTitle>
+        <CardTitle>કેટેગરી મેનેજમેન્ટ</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Add New Category */}
         <div className="space-y-2">
-          <Label htmlFor="new-category">Add New Category</Label>
+          <Label htmlFor="new-category">નવી કેટેગરી ઉમેરો</Label>
           <div className="flex gap-2">
             <Input
               id="new-category"
-              placeholder="Enter category name"
+              placeholder="કેટેગરીનું નામ દાખલ કરો"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && !saving && handleAddCategory()}
@@ -201,16 +201,16 @@ const CategoryManagement: React.FC = () => {
               ) : (
                 <Plus className="h-4 w-4 mr-2" />
               )}
-              {saving ? "Adding..." : "Add"}
+              {saving ? "ઉમેરી રહ્યું છે..." : "ઉમેરો"}
             </Button>
           </div>
         </div>
 
         {/* Categories List */}
         <div className="space-y-2">
-          <Label>Existing Categories</Label>
+          <Label>હાલની કેટેગરીઓ</Label>
           {categories.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No categories found</p>
+            <p className="text-gray-500 text-center py-8">કોઈ કેટેગરી મળી નથી</p>
           ) : (
             <div className="space-y-2">
               {categories.map((category) => (
@@ -231,11 +231,11 @@ const CategoryManagement: React.FC = () => {
                         {saving ? (
                           <Loader className="h-4 w-4 animate-spin" />
                         ) : (
-                          "Save"
+                          "સેવ કરો"
                         )}
                       </Button>
                       <Button size="sm" variant="outline" onClick={cancelEdit} disabled={saving}>
-                        Cancel
+                        રદ કરો
                       </Button>
                     </div>
                   ) : (
@@ -260,14 +260,14 @@ const CategoryManagement: React.FC = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                              <AlertDialogTitle>કેટેગરી ડિલીટ કરો</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete the category "{category.category}"? 
-                                This action cannot be undone.
+                                શું તમે ખરેખર કેટેગરી "{category.category}" ડિલીટ કરવા માંગો છો? 
+                                આ ક્રિયા પૂર્વવત્ કરી શકાશે નહીં.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel disabled={saving}>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel disabled={saving}>રદ કરો</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() => handleDeleteCategory(category.id)}
                                 className="bg-red-500 hover:bg-red-600"
@@ -276,10 +276,10 @@ const CategoryManagement: React.FC = () => {
                                 {saving ? (
                                   <>
                                     <Loader className="h-4 w-4 mr-2 animate-spin" />
-                                    Deleting...
+                                    ડિલીટ કરી રહ્યું છે...
                                   </>
                                 ) : (
-                                  "Delete"
+                                  "ડિલીટ કરો"
                                 )}
                               </AlertDialogAction>
                             </AlertDialogFooter>

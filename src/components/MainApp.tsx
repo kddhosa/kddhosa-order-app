@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import WaiterDashboard from "./WaiterDashboard";
@@ -21,7 +22,7 @@ const MainApp: React.FC = () => {
     default:
       return (
         <div className="text-center py-8">
-          <p className="text-red-600">Unknown user role: {user.role}</p>
+          <p className="text-red-600">અજાણ્યો વપરાશકર્તા પ્રકાર: {user.role}</p>
         </div>
       );
   }

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -43,17 +44,17 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Guest name is required";
+      newErrors.name = "મહેમાનનું નામ આવશ્યક છે";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = "ફોન નંબર આવશ્યક છે";
     } else if (!/^\+?[\d\s\-()]+$/.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid phone number";
+      newErrors.phone = "કૃપા કરીને માન્ય ફોન નંબર દાખલ કરો";
     }
 
     if (formData.guests < 1) {
-      newErrors.guests = "Number of guests must be at least 1";
+      newErrors.guests = "મહેમાનોની સંખ્યા ઓછામાં ઓછી 1 હોવી જોઈએ";
     }
 
     setErrors(newErrors);
@@ -82,21 +83,21 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
       <DialogContent className="sm:max-w-md bg-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            Register Guest - Table {tableNumber}
+            મહેમાન નોંધણી - ટેબલ {tableNumber}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-              Guest Name *
+              મહેમાનનું નામ *
             </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter guest name"
+                placeholder="મહેમાનનું નામ દાખલ કરો"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -114,14 +115,14 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               htmlFor="phone"
               className="text-sm font-medium text-gray-700"
             >
-              Phone Number *
+              ફોન નંબર *
             </Label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 id="phone"
                 type="tel"
-                placeholder="+1 (555) 123-4567"
+                placeholder="+91 98765 43210"
                 value={formData.phone}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
@@ -139,7 +140,7 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               htmlFor="guests"
               className="text-sm font-medium text-gray-700"
             >
-              Number of Guests
+              મહેમાનોની સંખ્યા
             </Label>
             <div className="relative">
               <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -168,13 +169,13 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               htmlFor="notes"
               className="text-sm font-medium text-gray-700"
             >
-              Special Requests (Optional)
+              વિશેષ વિનંતીઓ (વૈકલ્પિક)
             </Label>
             <div className="relative">
               <MessageSquare className="absolute left-3 top-3 text-gray-400 h-4 w-4" />
               <Textarea
                 id="notes"
-                placeholder="Any special requests or notes..."
+                placeholder="કોઈ વિશેષ વિનંતીઓ અથવા નોંધો..."
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
@@ -192,7 +193,7 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               className="flex-1"
               disabled={isLoading}
             >
-              Cancel
+              રદ કરો
             </Button>
             <Button
               type="submit"
@@ -202,7 +203,7 @@ const GuestRegistrationModal: React.FC<GuestRegistrationModalProps> = ({
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
-                "Register Guest"
+                "મહેમાન નોંધણી કરો"
               )}
             </Button>
           </div>
