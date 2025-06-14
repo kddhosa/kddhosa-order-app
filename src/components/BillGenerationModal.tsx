@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from "react";
 import {
   Dialog,
@@ -32,7 +31,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
-  const { gst } = useMenu();
+  const { GST } = useMenu();
 
   const getCurrentSessionOrders = () => {
     if (!table.sessionId) return [];
@@ -57,7 +56,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   };
 
   const getTax = () => {
-    return getSubtotal() * (gst / 100);
+    return getSubtotal() * (GST / 100);
   };
 
   const getTotal = () => {
@@ -118,7 +117,8 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
       console.error("Error processing payment:", error);
       toast({
         title: "ભૂલ",
-        description: "ચુકવણી પ્રક્રિયા કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
+        description:
+          "ચુકવણી પ્રક્રિયા કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
         variant: "destructive",
       });
     }
@@ -161,9 +161,13 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                       ઓર્ડર #{order.id.slice(-6)}
                     </span>
                     <Badge variant="outline">
-                      {order.status === "preparing" ? "તૈયાર કરી રહ્યું છે" :
-                       order.status === "ready" ? "તૈયાર" :
-                       order.status === "served" ? "સર્વ કર્યું" : order.status}
+                      {order.status === "preparing"
+                        ? "તૈયાર કરી રહ્યું છે"
+                        : order.status === "ready"
+                          ? "તૈયાર"
+                          : order.status === "served"
+                            ? "સર્વ કર્યું"
+                            : order.status}
                     </Badge>
                   </div>
                   <div className="space-y-2">
@@ -198,7 +202,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
                 <span>₹{getSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>કર ({gst}%):</span>
+                <span>કર ({GST}%):</span>
                 <span>₹{getTax().toFixed(2)}</span>
               </div>
               <Separator />

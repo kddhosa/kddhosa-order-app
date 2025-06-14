@@ -10,7 +10,7 @@ interface MenuContextType {
   categories: Category[];
   loading: boolean;
   error: string | null;
-  gst: number;
+  GST: number;
 }
 
 const MenuContext = createContext<MenuContextType>({
@@ -18,7 +18,7 @@ const MenuContext = createContext<MenuContextType>({
   categories: [],
   loading: true,
   error: null,
-  gst: DEFAULT_GST_RATE,
+  GST: DEFAULT_GST_RATE,
 });
 
 export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -26,7 +26,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [gst, setGst] = useState<number>(DEFAULT_GST_RATE);
+  const [GST, setGst] = useState<number>(DEFAULT_GST_RATE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
         const categories = await getDoc(doc(db, "menuItems", "categories"));
         if (categories.exists()) {
           const data = categories.data().items as Category[];
-          setCategories(data);
+          setCategories(data || []);
         } else {
           console.error("No categories found in menuItems document");
           setError("Categories not found");
@@ -50,7 +50,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchGST = async () => {
       try {
         const taxDoc = await getDoc(doc(db, "settings", "tax"));
-        setGst(taxDoc?.data()?.gst || DEFAULT_GST_RATE);
+        setGst(taxDoc?.data()?.GST || DEFAULT_GST_RATE);
       } catch (error) {
         setGst(DEFAULT_GST_RATE);
       }
@@ -65,7 +65,9 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
             ...doc.data(),
           })) as MenuItem[];
 
-          setMenuItems(items.filter((item) => item.name && item.price > 0));
+          setMenuItems(
+            items.filter((item) => item.name && item.price > 0) ?? []
+          );
           setLoading(false);
           setError(null);
         } catch (err) {
@@ -96,7 +98,7 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
         categories,
         loading,
         error,
-        gst,
+        GST,
       }}
     >
       {children}

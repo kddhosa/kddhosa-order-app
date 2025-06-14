@@ -38,12 +38,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       async (firebaseUser: FirebaseUser | null) => {
         if (firebaseUser) {
           try {
-            // Check if user is authorized
             const authDoc = await getDoc(
-              doc(db, "authorizedUsers", "auth_doc"),
+              doc(db, "authorizedUsers", "auth_doc")
             );
             const authData = authDoc.data();
 
+            console.log(
+              "Firebase User:",
+              authData?.emails?.includes(firebaseUser.email)
+            );
+            console.log("Auth Data:", authData?.roles?.[firebaseUser.email!]);
             if (
               authData?.emails?.includes(firebaseUser.email) &&
               authData?.roles?.[firebaseUser.email!]
@@ -68,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           setUser(null);
         }
         setLoading(false);
-      },
+      }
     );
 
     return unsubscribe;
