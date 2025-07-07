@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   collection,
@@ -49,6 +48,7 @@ import MenuManagement from "./MenuManagement";
 import TableManagement from "./TableManagement";
 import AnalyticsDialog from "./AnalyticsDialog";
 import CategoryManagement from "./CategoryManagement";
+import MenuOrderScreen from "./MenuOrderScreen";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -59,6 +59,8 @@ const ReceptionDashboard: React.FC = () => {
   const [showBillModal, setShowBillModal] = useState(false);
   const [generatingBill, setGeneratingBill] = useState<string | null>(null);
   const { toast } = useToast();
+  const [showMenuScreen, setShowMenuScreen] = useState(false);
+  const [menuTable, setMenuTable] = useState<Table | null>(null);
 
   useEffect(() => {
     const today = new Date();
@@ -136,11 +138,11 @@ const ReceptionDashboard: React.FC = () => {
   const getTableOrders = (tableId: string) => {
     const table = tables.find(t => t.id === tableId);
     if (!table || !table.sessionId) return [];
-    
+
     // Only return orders from current session using table's sessionId
     return orders.filter(
-      (order) => order.tableId === tableId && 
-                 order.sessionId === table.sessionId
+      (order) => order.tableId === tableId &&
+        order.sessionId === table.sessionId
     );
   };
 
@@ -189,6 +191,47 @@ const ReceptionDashboard: React.FC = () => {
     });
   };
 
+  // Add order directly as 'served' (not sent to kitchen)
+  const handleReceptionOrderSubmit = async (table: Table, orderItems: any[], notes: string) => {
+    if (!table.sessionId) {
+      toast({
+        title: "Error",
+        description: "Invalid table session. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await addDoc(collection(db, "orders"), {
+        tableId: table.id,
+        tableNumber: table.number,
+        guestName: table.guestName,
+        sessionId: table.sessionId,
+        waiterId: null, // Reception order
+        items: orderItems,
+        status: "served",
+        totalAmount: orderItems.reduce((total, item) => total + item.price * item.quantity, 0),
+        notes,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        servedAt: new Date(),
+      });
+      toast({
+        title: "Order Added",
+        description: `Order for Table ${table.number} added directly (served)`,
+      });
+      setShowMenuScreen(false);
+      setMenuTable(null);
+    } catch (error) {
+      console.error("Error adding order:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Layout title="રિસેપ્શન ડેશબોર્ડ">
@@ -204,6 +247,30 @@ const ReceptionDashboard: React.FC = () => {
           </div>
         </div>
       </Layout>
+    );
+  }
+
+  if (showMenuScreen && menuTable) {
+    return (
+      <>
+        <div className="p-4 bg-white border-b">
+          <Button
+            onClick={() => {
+              setShowMenuScreen(false);
+              setMenuTable(null);
+            }}
+            variant="outline"
+            className="mb-2"
+          >
+            <span className="mr-2">←</span> Back to Dashboard
+          </Button>
+        </div>
+        <MenuOrderScreen
+          table={menuTable}
+          onOrderSubmitted={() => setShowMenuScreen(false)}
+          submitOrderOverride={handleReceptionOrderSubmit}
+        />
+      </>
     );
   }
 
@@ -312,9 +379,9 @@ const ReceptionDashboard: React.FC = () => {
                     const tableTotal = getTableTotal(table.id);
                     const timeOccupied = table.occupiedAt
                       ? Math.floor(
-                          (new Date().getTime() - table.occupiedAt.getTime()) /
-                            (1000 * 60)
-                        )
+                        (new Date().getTime() - table.occupiedAt.getTime()) /
+                        (1000 * 60)
+                      )
                       : 0;
 
                     return (
@@ -353,6 +420,16 @@ const ReceptionDashboard: React.FC = () => {
                             ) : (
                               "બિલ બનાવો"
                             )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-blue-500 hover:bg-blue-600 ml-2"
+                            onClick={() => {
+                              setMenuTable(table);
+                              setShowMenuScreen(true);
+                            }}
+                          >
+                            Add Order
                           </Button>
                         </div>
                       </div>
@@ -403,8 +480,8 @@ const ReceptionDashboard: React.FC = () => {
                           }
                         >
                           {order.status === "preparing" ? "તૈયાર કરી રહ્યું છે" :
-                           order.status === "ready" ? "તૈયાર" :
-                           order.status === "served" ? "સર્વ કર્યું" : order.status}
+                            order.status === "ready" ? "તૈયાર" :
+                              order.status === "served" ? "સર્વ કર્યું" : order.status}
                         </Badge>
                         <p className="text-sm text-gray-600 mt-1">
                           {getTimeAgo(order.createdAt)}
@@ -478,9 +555,9 @@ const ReceptionDashboard: React.FC = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Badge variant="outline" className="text-xs">
-                                    {bill.paymentMethod === "cash" ? "રોકડ" : 
-                                     bill.paymentMethod === "card" ? "કાર્ડ" : 
-                                     bill.paymentMethod || "રોકડ"}
+                                    {bill.paymentMethod === "cash" ? "રોકડ" :
+                                      bill.paymentMethod === "card" ? "કાર્ડ" :
+                                        bill.paymentMethod || "રોકડ"}
                                   </Badge>
                                 </TableCell>
                               </TableRow>

@@ -17,11 +17,17 @@ import { useToast } from "@/hooks/use-toast";
 interface MenuOrderScreenProps {
   table: Table;
   onOrderSubmitted: () => void;
+  submitOrderOverride?: (
+    table: Table,
+    orderItems: OrderItem[],
+    notes: string
+  ) => Promise<void>;
 }
 
 const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   table,
   onOrderSubmitted,
+  submitOrderOverride,
 }) => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -98,24 +104,28 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
 
     setSubmitting(true);
     try {
-      await addDoc(collection(db, "orders"), {
-        tableId: table.id,
-        tableNumber: table.number,
-        guestName: table.guestName,
-        sessionId: table.sessionId,
-        waiterId: user?.uid,
-        items: orderItems,
-        status: "pending",
-        totalAmount: getTotalAmount(),
-        notes: orderNotes,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      if (submitOrderOverride) {
+        await submitOrderOverride(table, orderItems, orderNotes);
+      } else {
+        await addDoc(collection(db, "orders"), {
+          tableId: table.id,
+          tableNumber: table.number,
+          guestName: table.guestName,
+          sessionId: table.sessionId,
+          waiterId: user?.uid,
+          items: orderItems,
+          status: "pending",
+          totalAmount: getTotalAmount(),
+          notes: orderNotes,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
 
-      toast({
-        title: "Order Submitted",
-        description: `Order for Table ${table.number} sent to kitchen`,
-      });
+        toast({
+          title: "Order Submitted",
+          description: `Order for Table ${table.number} sent to kitchen`,
+        });
+      }
 
       setOrderItems([]);
       setOrderNotes("");

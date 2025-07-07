@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Receipt, CreditCard, DollarSign } from "lucide-react";
 import { useMenu } from "@/contexts/MenuContext";
+import { useReactToPrint } from "react-to-print";
 
 interface BillGenerationModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
   const { GST } = useMenu();
+  const billRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef: billRef });
 
   const getCurrentSessionOrders = () => {
     if (!table.sessionId) return [];
@@ -69,7 +72,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
       if (!table.sessionId) {
         throw new Error("અમાન્ય ટેબલ સેશન");
       }
-      // Create bill
+      reactToPrintFn();
       const billData: Omit<Bill, "id"> = {
         tableId: table.id,
         tableNumber: table.number,
@@ -136,83 +139,86 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Customer Info */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">ગ્રાહકની માહિતી</h3>
-            <p>
-              <strong>નામ:</strong> {table.guestName}
-            </p>
-            <p>
-              <strong>ફોન:</strong> {table.guestPhone}
-            </p>
-            <p>
-              <strong>ટેબલ:</strong> {table.number}
-            </p>
-          </div>
+          <div ref={billRef} className="space-x-4" id="bill-pdf-content">
+            {/* Customer Info */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">ગ્રાહકની માહિતી</h3>
+              <p>
+                <strong>નામ:</strong> {table.guestName}
+              </p>
+              <p>
+                <strong>ફોન:</strong> {table.guestPhone}
+              </p>
+              <p>
+                <strong>ટેબલ:</strong> {table.number}
+              </p>
+            </div>
 
-          {/* Orders */}
-          <div>
-            <h3 className="font-semibold mb-4">ઓર્ડરની વિગતો</h3>
-            <div className="space-y-4">
-              {currentSessionOrders.map((order, orderIndex) => (
-                <div key={order.id} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium">
-                      ઓર્ડર #{order.id.slice(-6)}
-                    </span>
-                    <Badge variant="outline">
-                      {order.status === "preparing"
-                        ? "તૈયાર કરી રહ્યું છે"
-                        : order.status === "ready"
-                          ? "તૈયાર"
-                          : order.status === "served"
-                            ? "સર્વ કર્યું"
-                            : order.status}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2">
-                    {order.items.map((item, itemIndex) => (
-                      <div
-                        key={itemIndex}
-                        className="flex justify-between text-sm"
-                      >
-                        <span>
-                          {item.quantity}x {item.name}
-                        </span>
-                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {order.notes && (
-                    <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
-                      <strong>નોંધ:</strong> {order.notes}
+            {/* Orders */}
+            <div>
+              <h3 className="font-semibold mb-4">ઓર્ડરની વિગતો</h3>
+              <div className="space-y-4">
+                {currentSessionOrders.map((order, orderIndex) => (
+                  <div key={order.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-medium">
+                        ઓર્ડર #{order.id.slice(-6)}
+                      </span>
+                      <Badge variant="outline">
+                        {order.status === "preparing"
+                          ? "તૈયાર કરી રહ્યું છે"
+                          : order.status === "ready"
+                            ? "તૈયાર"
+                            : order.status === "served"
+                              ? "સર્વ કર્યું"
+                              : order.status}
+                      </Badge>
                     </div>
-                  )}
+                    <div className="space-y-2">
+                      {order.items.map((item, itemIndex) => (
+                        <div
+                          key={itemIndex}
+                          className="flex justify-between text-sm"
+                        >
+                          <span>
+                            {item.quantity}x {item.name}
+                          </span>
+                          <span>
+                            ₹{(item.price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {order.notes && (
+                      <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
+                        <strong>નોંધ:</strong> {order.notes}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bill Summary */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-4">બિલનો સારાંશ</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>પેટા કુલ:</span>
+                  <span>₹{getSubtotal().toFixed(2)}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bill Summary */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-4">બિલનો સારાંશ</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>પેટા કુલ:</span>
-                <span>₹{getSubtotal().toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>કર ({GST}%):</span>
-                <span>₹{getTax().toFixed(2)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between text-lg font-bold">
-                <span>કુલ:</span>
-                <span>₹{getTotal().toFixed(2)}</span>
+                <div className="flex justify-between">
+                  <span>કર ({GST}%):</span>
+                  <span>₹{getTax().toFixed(2)}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-lg font-bold">
+                  <span>કુલ:</span>
+                  <span>₹{getTotal().toFixed(2)}</span>
+                </div>
               </div>
             </div>
           </div>
-
           {/* Payment Method */}
           <div>
             <h3 className="font-semibold mb-3">ચુકવણી પદ્ધતિ</h3>
