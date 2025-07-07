@@ -1,1 +1,7 @@
-{}
+{
+  "projects": {
+    "prod": "kddhosa-aedcb"
+  },
+  "targets": {},
+  "etags": {}
+}
