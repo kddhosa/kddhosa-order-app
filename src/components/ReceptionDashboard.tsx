@@ -136,13 +136,13 @@ const ReceptionDashboard: React.FC = () => {
   };
 
   const getTableOrders = (tableId: string) => {
-    const table = tables.find(t => t.id === tableId);
+    const table = tables.find((t) => t.id === tableId);
     if (!table || !table.sessionId) return [];
 
     // Only return orders from current session using table's sessionId
     return orders.filter(
-      (order) => order.tableId === tableId &&
-        order.sessionId === table.sessionId
+      (order) =>
+        order.tableId === tableId && order.sessionId === table.sessionId
     );
   };
 
@@ -192,7 +192,11 @@ const ReceptionDashboard: React.FC = () => {
   };
 
   // Add order directly as 'served' (not sent to kitchen)
-  const handleReceptionOrderSubmit = async (table: Table, orderItems: any[], notes: string) => {
+  const handleReceptionOrderSubmit = async (
+    table: Table,
+    orderItems: any[],
+    notes: string
+  ) => {
     if (!table.sessionId) {
       toast({
         title: "Error",
@@ -210,7 +214,10 @@ const ReceptionDashboard: React.FC = () => {
         waiterId: null, // Reception order
         items: orderItems,
         status: "served",
-        totalAmount: orderItems.reduce((total, item) => total + item.price * item.quantity, 0),
+        totalAmount: orderItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ),
         notes,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -379,9 +386,9 @@ const ReceptionDashboard: React.FC = () => {
                     const tableTotal = getTableTotal(table.id);
                     const timeOccupied = table.occupiedAt
                       ? Math.floor(
-                        (new Date().getTime() - table.occupiedAt.getTime()) /
-                        (1000 * 60)
-                      )
+                          (new Date().getTime() - table.occupiedAt.getTime()) /
+                            (1000 * 60)
+                        )
                       : 0;
 
                     return (
@@ -479,9 +486,13 @@ const ReceptionDashboard: React.FC = () => {
                                   : "bg-orange-500"
                           }
                         >
-                          {order.status === "preparing" ? "તૈયાર કરી રહ્યું છે" :
-                            order.status === "ready" ? "તૈયાર" :
-                              order.status === "served" ? "સર્વ કર્યું" : order.status}
+                          {order.status === "preparing"
+                            ? "તૈયાર કરી રહ્યું છે"
+                            : order.status === "ready"
+                              ? "તૈયાર"
+                              : order.status === "served"
+                                ? "સર્વ કર્યું"
+                                : order.status}
                         </Badge>
                         <p className="text-sm text-gray-600 mt-1">
                           {getTimeAgo(order.createdAt)}
@@ -555,9 +566,11 @@ const ReceptionDashboard: React.FC = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Badge variant="outline" className="text-xs">
-                                    {bill.paymentMethod === "cash" ? "રોકડ" :
-                                      bill.paymentMethod === "card" ? "કાર્ડ" :
-                                        bill.paymentMethod || "રોકડ"}
+                                    {bill.paymentMethod === "cash"
+                                      ? "રોકડ"
+                                      : bill.paymentMethod === "card"
+                                        ? "કાર્ડ"
+                                        : bill.paymentMethod || "રોકડ"}
                                   </Badge>
                                 </TableCell>
                               </TableRow>

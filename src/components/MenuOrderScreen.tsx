@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { collection, addDoc, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { OrderItem, Table, MenuItem } from "@/types";
+import { OrderItem, Table, MenuItem, Order } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMenu } from "@/contexts/MenuContext";
 import Layout from "./Layout";
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Minus, ShoppingCart, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import BillGenerationModal from "./BillGenerationModal";
 
 interface MenuOrderScreenProps {
   table: Table;
@@ -29,12 +30,39 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
   onOrderSubmitted,
   submitOrderOverride,
 }) => {
+  const [isBillModalOpen, setIsBillModalOpen] = useState<boolean>(false);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const { menuItems, categories, loading } = useMenu();
   const [orderNotes, setOrderNotes] = useState("");
+
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const ordersQuery = query(collection(db, "orders"));
+    const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
+      const ordersData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        updatedAt: doc.data().updatedAt?.toDate(),
+        servedAt: doc.data().servedAt?.toDate(),
+      })) as Order[];
+
+      const todayOrders = ordersData.filter(
+        (order) => order.createdAt >= today
+      );
+
+      setOrders(todayOrders);
+    });
+
+    return () => {
+      unsubscribeOrders();
+    };
+  }, []);
 
   const addToOrder = (menuItem: MenuItem) => {
     const existingItem = orderItems.find((item) => item.id === menuItem.id);
@@ -147,6 +175,14 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
     );
   };
 
+  const getTableOrders = (tableId: string) => {
+    if (!table || !table.sessionId) return [];
+    return orders.filter(
+      (order) =>
+        order.tableId === tableId && order.sessionId === table.sessionId
+    );
+  };
+
   if (loading) {
     return (
       <Layout title={`Order for Table ${table.number}`}>
@@ -159,13 +195,27 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
 
   return (
     <Layout title={`Order for Table ${table.number}`}>
+      <Button
+        onClick={() => setIsBillModalOpen(true)}
+        disabled={submitting}
+        className="w-full mb-8 bg-blue-500 hover:bg-green-600"
+      >
+        <Send className="h-4 w-4 mr-2" />
+        ઓર્ડસ જુઓ
+      </Button>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menu Items */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="appetizers" className="w-full">
             <TabsList className="grid grid-cols-1 lg:grid-cols-4 h-auto">
               {categories.map(({ id, category }) => (
-                <TabsTrigger key={id} value={category} className="capitalize">
+                <TabsTrigger
+                  key={id}
+                  value={category}
+                  defaultValue={categories?.[0]?.category}
+                  className="capitalize"
+                >
                   {category.replace("_", " ")}
                 </TabsTrigger>
               ))}
@@ -293,6 +343,15 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
           </Card>
         </div>
       </div>
+      <BillGenerationModal
+        isOpen={isBillModalOpen}
+        isReception={false}
+        onClose={() => {
+          setIsBillModalOpen(false);
+        }}
+        table={table}
+        orders={getTableOrders(table.id)}
+      />
     </Layout>
   );
 };

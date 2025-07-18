@@ -73,7 +73,7 @@ const WaiterDashboard: React.FC = () => {
   }, [toast]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || tables.length === 0) return;
 
     const ordersQuery = query(
       collection(db, "orders"),
@@ -92,10 +92,13 @@ const WaiterDashboard: React.FC = () => {
       // Filter to only show orders from current active sessions
       const activeSessionOrders = orders.filter((order) => {
         const table = tables.find((t) => t.id === order.tableId);
+        console.log({ table, order });
+
         if (!table || !table.sessionId) return false;
 
         return order.sessionId === table.sessionId;
       });
+      console.log({ activeSessionOrders });
 
       setReadyOrders(activeSessionOrders);
     });

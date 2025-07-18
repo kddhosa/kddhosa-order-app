@@ -21,6 +21,7 @@ interface BillGenerationModalProps {
   onClose: () => void;
   table: Table;
   orders: Order[];
+  isReception?: boolean; // Optional prop to indicate if this is for reception
 }
 
 const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
@@ -28,6 +29,7 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
   onClose,
   table,
   orders,
+  isReception = true,
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [processing, setProcessing] = useState(false);
@@ -219,47 +221,51 @@ const BillGenerationModal: React.FC<BillGenerationModalProps> = ({
               </div>
             </div>
           </div>
-          {/* Payment Method */}
-          <div>
-            <h3 className="font-semibold mb-3">ચુકવણી પદ્ધતિ</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant={paymentMethod === "cash" ? "default" : "outline"}
-                onClick={() => setPaymentMethod("cash")}
-                className="flex items-center justify-center"
-              >
-                <DollarSign className="h-4 w-4 mr-2" />
-                રોકડ
-              </Button>
-              <Button
-                variant={paymentMethod === "card" ? "default" : "outline"}
-                onClick={() => setPaymentMethod("card")}
-                className="flex items-center justify-center"
-              >
-                <CreditCard className="h-4 w-4 mr-2" />
-                કાર્ડ
-              </Button>
-            </div>
-          </div>
+          {isReception && (
+            <>
+              {/* Payment Method */}
+              <div>
+                <h3 className="font-semibold mb-3">ચુકવણી પદ્ધતિ</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant={paymentMethod === "cash" ? "default" : "outline"}
+                    onClick={() => setPaymentMethod("cash")}
+                    className="flex items-center justify-center"
+                  >
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    રોકડ
+                  </Button>
+                  <Button
+                    variant={paymentMethod === "card" ? "default" : "outline"}
+                    onClick={() => setPaymentMethod("card")}
+                    className="flex items-center justify-center"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    કાર્ડ
+                  </Button>
+                </div>
+              </div>
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-              disabled={processing}
-            >
-              રદ કરો
-            </Button>
-            <Button
-              onClick={handlePayment}
-              disabled={processing}
-              className="flex-1 bg-green-500 hover:bg-green-600"
-            >
-              {processing ? "પ્રક્રિયા કરી રહ્યું છે..." : "ચુકવણી કરો"}
-            </Button>
-          </div>
+              {/* Actions */}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1"
+                  disabled={processing}
+                >
+                  રદ કરો
+                </Button>
+                <Button
+                  onClick={handlePayment}
+                  disabled={processing}
+                  className="flex-1 bg-green-500 hover:bg-green-600"
+                >
+                  {processing ? "પ્રક્રિયા કરી રહ્યું છે..." : "ચુકવણી કરો"}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
