@@ -27,6 +27,7 @@ import {
   Settings,
   UtensilsCrossed,
   DeleteIcon,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,6 +52,17 @@ import AnalyticsDialog from "./AnalyticsDialog";
 import CategoryManagement from "./CategoryManagement";
 import MenuOrderScreen from "./MenuOrderScreen";
 import DeleteDataSection from "./DeleteDataSection";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { set } from "date-fns";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -63,6 +75,9 @@ const ReceptionDashboard: React.FC = () => {
   const { toast } = useToast();
   const [showMenuScreen, setShowMenuScreen] = useState(false);
   const [menuTable, setMenuTable] = useState<Table | null>(null);
+  const [isDeleteOrdersDialogOpen, setIsDeleteOrdersDialogOpen] =
+    useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -442,8 +457,20 @@ const ReceptionDashboard: React.FC = () => {
                               setShowMenuScreen(true);
                             }}
                           >
-                            Add Order
+                            ઓર્ડર ઉમેરો
                           </Button>
+                          {tableTotal === 0 && (
+                            <Button
+                              size="sm"
+                              className="bg-red-500 hover:bg-blue-600 ml-2"
+                              onClick={() => {
+                                setIsDeleteOrdersDialogOpen(true);
+                                setSelectedTable(table);
+                              }}
+                            >
+                              ટેબલ ફ્રી કરો
+                            </Button>
+                          )}
                         </div>
                       </div>
                     );
@@ -669,6 +696,68 @@ const ReceptionDashboard: React.FC = () => {
           <DeleteDataSection />
         </TabsContent>
       </Tabs>
+
+      {
+        <AlertDialog
+          open={isDeleteOrdersDialogOpen}
+          onOpenChange={setIsDeleteOrdersDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>શું તમે ચોક્કસ છો?</AlertDialogTitle>
+              <AlertDialogDescription>
+                ટેબલે ફ્રી કરવા થી અત્યારે બેઠેલા ગ્રાહક ના ડેટા રિમૂવ થઇ જશે.
+                શું તમે ખરેખર ટેબલ ફ્રી કરવા માંગો છો?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>
+                રદ કરો
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  try {
+                    await updateDoc(doc(db, "tables", selectedTable.id), {
+                      status: "available",
+                      guestName: null,
+                      guestPhone: null,
+                      occupiedAt: null,
+                      waiterId: null,
+                      sessionId: null,
+                    });
+                  } catch {
+                    toast({
+                      title: "Error",
+                      description:
+                        "ટેબલ ફ્રી કરવામાં ભૂલ આવી છે. ફરી પ્રયાસ કરો.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsDeleting(false);
+                    setIsDeleteOrdersDialogOpen(false);
+                    setSelectedTable(null);
+                    toast({
+                      title: "ટેબલ ફ્રી કરી દેવામાં આવ્યું",
+                      description: `ટેબલ ${selectedTable.number} ફ્રી કરી દેવામાં આવ્યું છે.`,
+                    });
+                  }
+                }}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ટેબલ ફ્રી થઇ રહ્યું છે ...
+                  </>
+                ) : (
+                  "ટેબલ ફ્રી કરવું છે? "
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      }
 
       {selectedTable && (
         <BillGenerationModal
