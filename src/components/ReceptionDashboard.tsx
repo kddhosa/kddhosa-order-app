@@ -26,6 +26,7 @@ import {
   History,
   Settings,
   UtensilsCrossed,
+  DeleteIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,6 +50,7 @@ import TableManagement from "./TableManagement";
 import AnalyticsDialog from "./AnalyticsDialog";
 import CategoryManagement from "./CategoryManagement";
 import MenuOrderScreen from "./MenuOrderScreen";
+import DeleteDataSection from "./DeleteDataSection";
 
 const ReceptionDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -302,6 +304,10 @@ const ReceptionDashboard: React.FC = () => {
           <TabsTrigger value="table-management">
             <Settings className="h-4 w-4 mr-2" />
             ટેબલ મેનેજમેન્ટ
+          </TabsTrigger>
+          <TabsTrigger value="delet-data">
+            <DeleteIcon className="h-4 w-4 mr-2" />
+            ડિલીટ ડેટા
           </TabsTrigger>
         </TabsList>
 
@@ -657,6 +663,10 @@ const ReceptionDashboard: React.FC = () => {
 
         <TabsContent value="table-management">
           <TableManagement />
+        </TabsContent>
+
+        <TabsContent value="delet-data">
+          <DeleteDataSection />
         </TabsContent>
       </Tabs>
 

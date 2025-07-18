@@ -331,7 +331,7 @@ const MenuOrderScreen: React.FC<MenuOrderScreenProps> = ({
 
                   <Button
                     onClick={submitOrder}
-                    disabled={submitting}
+                    disabled={submitting || orderItems?.length === 0}
                     className="w-full bg-green-500 hover:bg-green-600"
                   >
                     <Send className="h-4 w-4 mr-2" />
